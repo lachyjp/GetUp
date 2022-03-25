@@ -3,7 +3,6 @@ const txnURL = "https://api.up.com.au/api/v1/transactions";
 
 function submitUpKey() {
     var upKey = document.getElementById("upKeyInput").value;
-    document.getElementById("demo").innerHTML = upKey;
 
     getUp(upKey);
     getTxn(upKey);
@@ -22,9 +21,9 @@ async function getUp(upKey) {
     
     //CONFIRMING SUCCESSFUL REQUEST
     if (status == 200) {
-        document.getElementById("acc-status").innerHTML = status + ", Success!";
+        document.getElementById("acc-status").innerHTML = "Accounts HTTP Status: " + status + ", Success!";
     } else {
-        document.getElementById("acc-status").innerHTML = status + ", Error: check your Up API Key is correct and try again";
+        document.getElementById("acc-status").innerHTML = "Accounts HTTP Status: " + status + ", Error: check your Up API Key is correct and try again";
     }
 
     let balances = [];
@@ -45,7 +44,7 @@ async function getUp(upKey) {
         element.appendChild(p); 
     }
 
-    document.getElementById("total-balance").innerHTML = total;
+    document.getElementById("total-balance").innerHTML = "Your total balance: $" + total;
     console.log(balances);
 }
 
@@ -62,9 +61,9 @@ async function getTxn(upKey) {
     
     //CONFIRMING SUCCESSFUL REQUEST
     if (status == 200) {
-        document.getElementById("txn-status").innerHTML = status + ", Success!";
+        document.getElementById("txn-status").innerHTML = "Transactions HTTP status " + status + ", Success!";
     } else {
-        document.getElementById("txn-status").innerHTML = status + ", Error: check your Up API Key is correct and try again";
+        document.getElementById("txn-status").innerHTML = "Transactions HTTP status " + status + ", Error: check your Up API Key is correct and try again";
     }
 
     let lastTxnDesc = obj["data"][0]["attributes"]["description"];
