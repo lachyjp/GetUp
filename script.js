@@ -1,9 +1,13 @@
-var upKey = " ";
 const accURL = "https://api.up.com.au/api/v1/accounts";
 const txnURL = "https://api.up.com.au/api/v1/transactions";
 
-getUp(upKey);
-getTxn(upKey);
+function submitUpKey() {
+    var upKey = document.getElementById("upKeyInput").value;
+    document.getElementById("demo").innerHTML = upKey;
+
+    getUp(upKey);
+    getTxn(upKey);
+}
 
 async function getUp(upKey) {
     //REQUESTING JSON OBJECT
