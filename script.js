@@ -43,7 +43,13 @@ async function getUp(upKey) {
     
     let obj = await response.json();
     let status = response.status;
-    let id = "acc-status";
+    let id = "";
+    
+    if (status == 200) {
+        id = "acc-status-successful";
+    } else {
+        id = "acc-status-failed";
+    }
     
     //CONFIRMING SUCCESSFUL REQUEST
     checkStatus(status, id);
@@ -76,9 +82,14 @@ async function getTxn(upKey) {
     
     let obj = await response.json();
     let status = response.status;
-    let id = "txn-status"
+    let id = "";
     
-    //CONFIRMING SUCCESSFUL REQUEST
+    if (status == 200) {
+        id = "txn-status-successful";
+    } else {
+        id = "txn-status-failed";
+    }
+
     checkStatus(status, id);
 
     let txnDesc = [];

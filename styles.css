@@ -1,0 +1,81 @@
+@font-face {
+    font-family: Circular-Black;
+    src: url(fonts/CircularStd-Black.otf);
+}
+
+@font-face {
+    font-family: Circular-BlackItalic;
+    src: url(fonts/CircularStd-BlackItalic.otf);
+}
+
+@font-face {
+    font-family: Circular-Bold;
+    src: url(fonts/CircularStd-Bold.otf);
+}
+
+@font-face {
+    font-family: Circular-Book;
+    src: url(fonts/CircularStd-Book.otf);
+}
+
+@font-face {
+    font-family: Circular-Medium;
+    src: url(fonts/CircularStd-Medium.otf);
+}
+
+@font-face {
+    font-family: Circular-Light;
+    src: url(fonts/CircularStd-Light.otf);
+}
+
+body {
+    background-color: #24242f;
+}
+
+h1 {
+    color: #e57d68;
+    font-family: Circular-Black;
+
+}
+
+h2 {
+    color: white;
+    font-family: Circular-Bold;
+
+}
+
+h3 {
+    color: white;
+
+}
+
+p {
+    color: #fbfbfa;
+    font-family: Circular-Book;
+
+}
+
+label {
+    color: white;
+}
+
+div.container {
+    margin-top: 60px;
+}
+
+div.divStatus {
+    margin-top: 60px;
+}
+
+div.divActivity {
+    margin-top: 60px;
+}
+
+div.divAccounts {
+    margin-top: 60px;
+}
+
+button.btn.btn-primary {
+    background-color: #e57d68;
+    border-color: #e57d68;
+}
