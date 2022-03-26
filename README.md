@@ -7,7 +7,7 @@ This script does not store or transmit any personal data. Do not share your Up A
 ## Instructions
 1. Get your Up API key at https://api.up.com.au/getting_started
 2. Open index.html
-3. Enter your Up key into the text field and press 'Add key'
+3. Enter your Up key and press 'Add key'
 
 ## Future versions
 The page at the moment is unformatted. Future versions should include custom CSS.
