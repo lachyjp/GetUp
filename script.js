@@ -3,9 +3,34 @@ const txnURL = "https://api.up.com.au/api/v1/transactions";
 
 function submitUpKey() {
     var upKey = document.getElementById("upKeyInput").value;
-
     getUp(upKey);
     getTxn(upKey);
+}
+
+function newTextNode(newMessage, type , id) {
+    let p = document.createElement(type);
+    let node = document.createTextNode(newMessage);
+    p.appendChild(node);
+    let element = document.getElementById(id);
+    element.appendChild(p); 
+}
+
+function checkStatus(status, id) {
+    if (status == 200) {
+        document.getElementById(id).innerHTML = status + ": Successful response!";
+    } else if (status == 400) {
+        document.getElementById(id).innerHTML = status + ": Bad request - Typically a problem with the query string or an encoding error";
+    }  else if (status == 401) {
+        document.getElementById(id).innerHTML = status + ": Request not authenticated - ensure API key is correct.";
+    }  else if (status == 404) {
+        document.getElementById(id).innerHTML = status + ": Not found - Either the endpoint does not exist, or the requested resource does not exist.";
+    }  else if (status == 422) {
+        document.getElementById(id).innerHTML = status + ": Invalid request - The request contains invalid data and was not processed.";
+    }  else if (status == 429) {
+        document.getElementById(id).innerHTML = status + ": Too many requests - You have been rate limited—try later, ideally with exponential backoff.";
+    }  else if (status =+ 500) {
+        document.getElementById(id).innerHTML = status + ": Server-side error - try again later.";
+    }
 }
 
 async function getUp(upKey) {
@@ -18,13 +43,10 @@ async function getUp(upKey) {
     
     let obj = await response.json();
     let status = response.status;
+    let id = "acc-status";
     
     //CONFIRMING SUCCESSFUL REQUEST
-    if (status == 200) {
-        document.getElementById("acc-status").innerHTML = "Accounts HTTP Status: " + status + ", Success!";
-    } else {
-        document.getElementById("acc-status").innerHTML = "Accounts HTTP Status: " + status + ", Error: check your Up API Key is correct and try again";
-    }
+    checkStatus(status, id);
 
     let balances = [];
     let accounts = [];
@@ -37,15 +59,11 @@ async function getUp(upKey) {
         total = total + balances[i];
 
         //ADDING EACH ACCOUNT IN HTML
-        let p = document.createElement("p");
-        let node = document.createTextNode(`Your ${accounts[i]} balance is $${balances[i]}`);
-        p.appendChild(node);
-        let element = document.getElementById("div1");
-        element.appendChild(p); 
+        newTextNode(`Your ${accounts[i]} balance is $${balances[i]}`, "p", "accounts");
     }
 
     document.getElementById("total-balance").innerHTML = "Your total balance: $" + total;
-    console.log(balances);
+    console.log(obj);
 }
 
 async function getTxn(upKey) {
@@ -58,20 +76,20 @@ async function getTxn(upKey) {
     
     let obj = await response.json();
     let status = response.status;
+    let id = "txn-status"
     
     //CONFIRMING SUCCESSFUL REQUEST
-    if (status == 200) {
-        document.getElementById("txn-status").innerHTML = "Transactions HTTP status " + status + ", Success!";
-    } else {
-        document.getElementById("txn-status").innerHTML = "Transactions HTTP status " + status + ", Error: check your Up API Key is correct and try again";
+    checkStatus(status, id);
+
+    let txnDesc = [];
+    let txnAmount = [];
+
+    for (i = 0; i < 10; i++) {
+        txnDesc.push(obj["data"][i]["attributes"]["description"]);
+        txnAmount.push(parseFloat(obj["data"][i]["attributes"]["amount"]["value"]));
+
+        newTextNode(`${txnDesc[i]} for $${txnAmount[i]}`, "p", "activity");
     }
 
-    let lastTxnDesc = obj["data"][0]["attributes"]["description"];
-    let lastTxnAmount = parseFloat(obj["data"][0]["attributes"]["amount"]["value"]);
-
-    let p = document.createElement("p");
-    let node = document.createTextNode("Your last transaction was from " + lastTxnDesc + " for $" + lastTxnAmount);
-    p.appendChild(node);
-    let element = document.getElementById("div1");
-    element.appendChild(p); 
+    console.log(obj);
 }

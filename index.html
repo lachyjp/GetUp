@@ -2,6 +2,7 @@
 <html>
 <head>
 <title>Up Project</title>
+<link rel="icon" type="image/x-icon" href="images/favicon.ico"/>
 <script src="script.js"></script>
 </head>
 
@@ -10,11 +11,20 @@
         <h1>Up Project</h1>
         <p>Welcome to my web browser Up balance tracker ⚡️</p>
         <p>Access your Up API key by following the link at the <a href="https://api.up.com.au/getting_started">Up official documentation here</a> and follow the instructions. <br> This project does not store or transmit any personal data. Do not share or store your Up key with anyone.</p>
-        <input type="text" id="upKeyInput" value="Enter your Up API Key here.">
+        
+        <label for="upKeyInput">Up key:</label>
+        <input type="text" id="upKeyInput" autocomplete="off">
         <button onclick="submitUpKey()">Add key</button>
-        <p><span id="acc-status"></span></p> 
-        <p><span id="txn-status"></span></p>   
+        
+        <h2>Service Status</h2>
+        <p>Accounts HTTP status: <span id="acc-status"></span></p> 
+        <p>Transactions HTTP status: <span id="txn-status"></span></p>
+        <h2>Accounts</h2>   
         <p><span id="total-balance"></span></p>
+        <p><span id="accounts"></span></p>
+        <h2>Activity</h2>
+        <p>Your last ten transactions</p>
+        <p><span id="activity"></span></p>
     </div>
 </body>
 
