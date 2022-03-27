@@ -1,4 +1,4 @@
-# Up Bank Balance Tracker
+# GetUp - Web Viewer for Up Bank
 This is a simple javascript-based project allowing members of Up Bank to view their current balances and latest transaction on a locally run webpage.
 
 ## Privacy
