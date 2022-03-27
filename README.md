@@ -10,4 +10,4 @@ This script does not store or transmit any personal data. Do not share your Up A
 3. Enter your Up key and press 'Add key'
 
 ## Future versions
-The page at the moment is unformatted. Future versions should include custom CSS.
+TBD

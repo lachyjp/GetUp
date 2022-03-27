@@ -35,28 +35,26 @@ body {
 h1 {
     color: #e57d68;
     font-family: Circular-Black;
-
 }
 
 h2 {
     color: white;
     font-family: Circular-Bold;
-
 }
 
 h3 {
     color: white;
-
+    font-family: Circular-Bold;
 }
 
 p {
     color: #fbfbfa;
     font-family: Circular-Book;
-
 }
 
 label {
     color: white;
+    font-family: Circular-Bold;
 }
 
 div.container {
@@ -75,7 +73,10 @@ div.divAccounts {
     margin-top: 60px;
 }
 
+button.btn {
+    font-family: Circular-Medium;
+}
 button.btn.btn-primary {
     background-color: #e57d68;
-    border-color: #e57d68;
+    border-color: #e57d68
 }
