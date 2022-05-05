@@ -17,15 +17,18 @@ async function getAcc(upKey) {
     })
     if (response.status >= 200 && response.status <= 299) {
         //SUCCESS
-        obj = await response.json();
+        let obj = await response.json();
         console.log(obj);
         document.getElementById(httpAccStatus[0]).innerHTML = `${response.status}: Success!`;
 
         //ADD ACCOUNTS
         let balanceTotal = 0;
         for (i = 0; i < 5; i++) {
-            newTextNode(`Your ${obj.data[i].attributes.displayName} balance is $${parseFloat(obj.data[i].attributes.balance.value)}`, "p", "accounts");
-            balanceTotal += parseFloat(obj.data[i].attributes.balance.value);
+            let accName = obj.data[i].attributes.displayName;
+            let accValue = parseFloat(obj.data[i].attributes.balance.value);
+            
+            newTextNode(`Your ${accName} balance is $${accValue}`, "p", "accounts");
+            balanceTotal += accValue;
         };
         document.getElementById("total-balance").innerHTML = "Your total balance: $" + balanceTotal;
 
@@ -45,13 +48,15 @@ async function getTxn(upKey) {
     })
     if (response.status >= 200 && response.status <= 299) {
         //SUCCESS
-        obj = await response.json();
+        let obj = await response.json();
+        console.log(obj);
         document.getElementById(httpTxnStatus[0]).innerHTML = `${response.status}: Success!`;
 
         //ADD TRANSACTIONS
-        console.log(obj);
         for (i = 0; i < 20; i++) {
-            newTextNode(`${obj.data[i].attributes.description} for $${parseFloat(obj.data[i].attributes.amount.value)}`, "p", "activity");
+            let txnDesc = obj.data[i].attributes.description;
+            let txnValue = parseFloat(obj.data[i].attributes.amount.value);
+            newTextNode(`${txnDesc} for $${txnValue}`, "p", "activity");
         };
 
     } else {
@@ -66,6 +71,6 @@ function newTextNode(newMessage, type , id) {
     let p = document.createElement(type);
     let node = document.createTextNode(newMessage);
     p.appendChild(node);
-    let element = document.getElementById(id);
+    let element = document.getElementById(id)
     element.appendChild(p); 
 };
