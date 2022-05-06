@@ -80,3 +80,13 @@ button.btn.btn-primary {
     background-color: #e57d68;
     border-color: #e57d68
 }
+
+footer {
+    position: fixed;
+    padding-top: 10px;
+    padding-left: 100px;
+    background-color: #1b1b27;
+    height: 50px;
+    bottom: 0;
+    width: 100%;
+}
