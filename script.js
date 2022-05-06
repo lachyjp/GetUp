@@ -2,6 +2,7 @@ const accURL = "https://api.up.com.au/api/v1/accounts";
 const txnURL = "https://api.up.com.au/api/v1/transactions";
 const httpAccStatus = ['acc-status-successful', 'acc-status-failed'];
 const httpTxnStatus = ['txn-status-successful', 'txn-status-failed'];
+const authStatus = ['auth-status-successful', 'auth-status-failed'];
 
 function submitUpKey() {
     let upKey = document.getElementById("upKeyInput").value;
@@ -20,13 +21,16 @@ async function getAcc(upKey) {
         let obj = await response.json();
         console.log(obj);
         document.getElementById(httpAccStatus[0]).innerHTML = `${response.status}: Success!`;
+        console.log(obj.length)
 
         //ADD ACCOUNTS
         let balanceTotal = 0;
-        for (i = 0; i < 5; i++) {
+        for (i = 0; i < obj.data.length; i++) {
             let accName = obj.data[i].attributes.displayName;
             let accValue = parseFloat(obj.data[i].attributes.balance.value);
-            
+            //let accType = obj.data[i].attributes.accountType;
+            //let accOwner = obj.data[i].attributes.ownershipType;
+
             newTextNode(`Your ${accName} balance is $${accValue}`, "p", "accounts");
             balanceTotal += accValue;
         };
@@ -52,12 +56,50 @@ async function getTxn(upKey) {
         console.log(obj);
         document.getElementById(httpTxnStatus[0]).innerHTML = `${response.status}: Success!`;
 
+        var txn = [];
+
         //ADD TRANSACTIONS
-        for (i = 0; i < 20; i++) {
+        for (i = 0; i < obj.data.length; i++) {
             let txnDesc = obj.data[i].attributes.description;
-            let txnValue = parseFloat(obj.data[i].attributes.amount.value);
-            newTextNode(`${txnDesc} for $${txnValue}`, "p", "activity");
+            let txnValType = ""
+            let txnVal = parseFloat(obj.data[i].attributes.amount.value);
+            let txnStatus = obj.data[i].attributes.status;
+            let txnRawDate =  obj.data[i].attributes.createdAt;
+            let txnRawText = obj.data[i].attributes.rawText;
+            let txnMessage = obj.data[i].attributes.message;
+            let txnRoundUp = obj.data[i].attributes.roundUp;
+
+            //formatting data
+            if (txnVal < 0) {
+                txnVal = txnVal * -1
+                txnValType = "";
+            }
+            else {
+                txnValType = "+";
+            };
+
+            if (txnRawText == null) {
+                txnRawText = "";
+            }
+
+            if (txnMessage == null) {
+                txnMessage = "";
+            }
+
+            if (txnRoundUp == null) {
+                txnRoundUp = "";
+            }
+
+            let txnArray = [];
+            txnArray[i] = new Transaction(txnDesc, txnValType, txnVal, txnStatus, txnRawDate, txnRawText, txnMessage, txnRoundUp);
+            txn.push(txnArray[i])
+
+            newTextNode(`${txn[i].desc}, ${txn[i].type}$${txnVal}, ${txn[i].status}, ${txn[i].date}, ${txn[i].text} ${txn[i].msg} ${txn[i].roundup}`, "p", "activity");
+
+            
         };
+        console.log(txn);
+        newTextNode()
 
     } else {
         //ERROR
@@ -72,5 +114,16 @@ function newTextNode(newMessage, type , id) {
     let node = document.createTextNode(newMessage);
     p.appendChild(node);
     let element = document.getElementById(id)
-    element.appendChild(p); 
+    element.appendChild(p);
 };
+
+function Transaction (description, type, value, status, date, text, message, roundup) {
+    this.desc = description;
+    this.type = type;
+    this.val = value;
+    this.status = status;
+    this.date = date;
+    this.text = text;
+    this.msg = message;
+    this.roundup = roundup;
+}
