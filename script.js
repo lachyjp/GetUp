@@ -3,13 +3,6 @@ const txnURL = "https://api.up.com.au/api/v1/transactions";
 const httpAccStatus = ['acc-status-successful', 'acc-status-failed'];
 const httpTxnStatus = ['txn-status-successful', 'txn-status-failed'];
 const authStatus = ['auth-status-successful', 'auth-status-failed'];
-const options = {
-	method: 'GET',
-	headers: {
-		'X-RapidAPI-Host': 'contextualwebsearch-websearch-v1.p.rapidapi.com',
-		'X-RapidAPI-Key': 'da494ecdc7msheef92a697e197f3p11fd65jsnf313d41588c9'
-	}
-};
 
 function submitUpKey() {
     let upKey = document.getElementById("upKeyInput").value;
