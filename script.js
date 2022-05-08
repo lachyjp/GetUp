@@ -23,16 +23,26 @@ async function getAcc(upKey) {
         document.getElementById(httpAccStatus[0]).innerHTML = `${response.status}: Success!`;
 
         //ADD ACCOUNTS
-        let balanceTotal = 0;
+        var balanceTotal = 0;
+        var account = [];
+        var accArray = [];
+
         for (i = 0; i < obj.data.length; i++) {
             let accName = obj.data[i].attributes.displayName;
             let accValue = parseFloat(obj.data[i].attributes.balance.value);
-            //let accType = obj.data[i].attributes.accountType;
-            //let accOwner = obj.data[i].attributes.ownershipType;
+            let accType = obj.data[i].attributes.accountType;
+            let accOwner = obj.data[i].attributes.ownershipType;
 
-            newTextNode(`Your ${accName} balance is $${accValue}`, "p", "accounts");
-            balanceTotal += accValue;
-        };
+            //new array
+            accArray[i] = new Account(accName, accValue, accType, accOwner);
+            account.push(accArray[i]);
+
+            newTextNode(`Your ${account[i].name} balance is $${account[i].balance}, account type is ${account[i].type} and owned by ${account[i].owner}`, "p", "accounts");
+            balanceTotal = balanceTotal + account[i].balance;
+         };
+
+        balanceTotal = balanceTotal.toFixed(2);
+
         document.getElementById("total-balance").innerHTML = "Your total balance: $" + balanceTotal;
 
     } else {
@@ -56,9 +66,10 @@ async function getTxn(upKey) {
         document.getElementById(httpTxnStatus[0]).innerHTML = `${response.status}: Success!`;
 
         var txn = [];
+        var txnArray = [];
 
         //ADD TRANSACTIONS
-        for (i = 0; i < 20; i++) {
+        for (i = 0; i < obj.data.length; i++) {
             //let txnIcon = txnURL
             let txnDesc = obj.data[i].attributes.description;
             let txnValType = "";
@@ -88,7 +99,6 @@ async function getTxn(upKey) {
             };
 
             //new array
-            let txnArray = [];
             txnArray[i] = new Transaction(txnDesc, txnValType, txnVal, txnStatus, txnRawDate, txnRawText, txnMessage, txnRoundUp);
             txn.push(txnArray[i])
            
@@ -97,7 +107,6 @@ async function getTxn(upKey) {
         for (i = 0; i < txn.length; i++) {
             newTextNode(`${txn[i].desc}, ${txn[i].type}$${txn[i].val}, ${txn[i].status}, ${txn[i].date}, ${txn[i].text} ${txn[i].msg} ${txn[i].roundup}`, "p", "activity");
         }
-        console.log(txn);
 
     } else {
         //ERROR
@@ -124,4 +133,11 @@ function Transaction (description, type, value, status, date, text, message, rou
     this.text = text;
     this.msg = message;
     this.roundup = roundup;
+}
+
+function Account (name, balance, type, owner) {
+    this.name = name;
+    this.balance = balance;
+    this.type = type;
+    this.owner = owner;
 }
