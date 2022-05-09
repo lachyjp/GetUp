@@ -3,6 +3,7 @@ const txnURL = "https://api.up.com.au/api/v1/transactions";
 const httpAccStatus = ['acc-status-successful', 'acc-status-failed'];
 const httpTxnStatus = ['txn-status-successful', 'txn-status-failed'];
 const authStatus = ['auth-status-successful', 'auth-status-failed'];
+const months = ['January', 'February', 'March', 'April', 'May', 'June', 'July', 'August', 'September', 'October', 'November', 'December']
 
 function submitUpKey() {
     let upKey = document.getElementById("upKeyInput").value;
@@ -80,6 +81,11 @@ async function getTxn(upKey) {
             let txnMessage = obj.data[i].attributes.message;
             let txnRoundUp = obj.data[i].attributes.roundUp;
 
+            let dateTime = formatDate(txnRawDate);
+            let txnDate = dateTime[0];
+            let txnTime = dateTime[1];
+            
+
             //formatting data
             if (txnVal < 0) {
                 txnVal = txnVal * -1;
@@ -99,13 +105,13 @@ async function getTxn(upKey) {
             };
 
             //new array
-            txnArray[i] = new Transaction(txnDesc, txnValType, txnVal, txnStatus, txnRawDate, txnRawText, txnMessage, txnRoundUp);
+            txnArray[i] = new Transaction(txnDesc, txnValType, txnVal, txnStatus, txnDate, txnTime, txnRawText, txnMessage, txnRoundUp);
             txn.push(txnArray[i])
            
         };
 
         for (i = 0; i < txn.length; i++) {
-            newTextNode(`${txn[i].desc}, ${txn[i].type}$${txn[i].val}, ${txn[i].status}, ${txn[i].date}, ${txn[i].text} ${txn[i].msg} ${txn[i].roundup}`, "p", "activity");
+            newTextNode(`${txn[i].desc}, ${txn[i].type}$${txn[i].val}, ${txn[i].status}, ${txn[i].date}, ${txn[i].time}, ${txn[i].text} ${txn[i].msg} ${txn[i].roundup}`, "p", "activity");
         }
 
     } else {
@@ -124,12 +130,13 @@ function newTextNode(newMessage, type , id) {
     element.appendChild(p);
 };
 
-function Transaction (description, type, value, status, date, text, message, roundup) {
+function Transaction (description, type, value, status, date, time, text, message, roundup) {
     this.desc = description;
     this.type = type;
     this.val = value;
     this.status = status;
     this.date = date;
+    this.time = time;
     this.text = text;
     this.msg = message;
     this.roundup = roundup;
@@ -140,4 +147,9 @@ function Account (name, balance, type, owner) {
     this.balance = balance;
     this.type = type;
     this.owner = owner;
+}
+
+function formatDate(time) {
+    let splitTimeDate = time.split("T")
+    return splitTimeDate;
 }
