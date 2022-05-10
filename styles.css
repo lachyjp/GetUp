@@ -30,6 +30,7 @@
 
 body {
     background-color: #24242f;
+    overflow-y: scroll;
 }
 
 h1 {
@@ -47,8 +48,18 @@ h3 {
     font-family: Circular-Bold;
 }
 
+h4 {
+    color: #e57d68;
+    font-family: Circular-Bold;
+}
+
 p {
     color: #fbfbfa;
+    font-family: Circular-Book;
+}
+
+p.p2 {
+    color: #5c5c5c;
     font-family: Circular-Book;
 }
 
@@ -60,6 +71,32 @@ label {
 div.container {
     margin-top: 60px;
 }
+
+
+
+.accordion {
+    margin-bottom: 20px;
+    border-color: #e57d68;
+}
+
+.accordion-item {
+    background-color: #343444;
+}
+
+.accordion-button {
+    background-color: #343444;
+    font-family: Circular-Bold;
+    color: #fbfbfa;
+    
+}
+
+.accordion-body {
+    background-color: #343444;
+    color:#ffffff;
+    font-family: Circular-Book;
+}
+
+
 
 div.divStatus {
     margin-top: 60px;
@@ -80,6 +117,7 @@ button.btn.btn-primary {
     background-color: #e57d68;
     border-color: #e57d68
 }
+
 
 footer {
     position: fixed;

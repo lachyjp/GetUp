@@ -71,7 +71,6 @@ async function getTxn(upKey) {
 
         //ADD TRANSACTIONS
         for (i = 0; i < obj.data.length; i++) {
-            //let txnIcon = txnURL
             let txnDesc = obj.data[i].attributes.description;
             let txnValType = "";
             let txnVal = parseFloat(obj.data[i].attributes.amount.value);
@@ -83,10 +82,10 @@ async function getTxn(upKey) {
 
             let dateTime = formatDate(txnRawDate);
             let txnDate = dateTime[0];
-            let txnTime = dateTime[1];
+            let txnTime = formatTime(dateTime[1]);
             
 
-            //formatting data
+            //Formatting data
             if (txnVal < 0) {
                 txnVal = txnVal * -1;
                 txnValType = "";
@@ -104,39 +103,44 @@ async function getTxn(upKey) {
                 txnRoundUp = "";
             };
 
-            //new array
+            //Push transactions as objects
             txnArray[i] = new Transaction(txnDesc, txnValType, txnVal, txnStatus, txnDate, txnTime, txnRawText, txnMessage, txnRoundUp);
             txn.push(txnArray[i])
         };
 
+        //Creating dates
         var dates = [];
         for (i = 0; i < txn.length; i++) {
             dates.push(txn[i].date);
         }
-        
-        function removeDuplicates(dates) {
-            return dates.filter((item,
-                index) => dates.indexOf(item) === index);
-        }
-
         dates = removeDuplicates(dates);
         console.log(dates);
 
+        //Converting date to long date
+        let newDate = []
         for (i = 0; i < dates.length; i++) {
+            let dateSplit = dates[i].split("-");
+            let dayFloat = parseFloat(dateSplit[2]);
 
-            newTextNode(`${dates[i]}`, "h4", "activity")
+            let monthFloat = parseFloat(dateSplit[1]);
+
+            monthFloat = months[monthFloat-1];
+            newDate.push(`${dayFloat} ${monthFloat}`)
+        }
+
+        //Print transactions
+        for (i = 0; i < dates.length; i++) {
+            newTextNode(`${newDate[i]}`, "h4", "activity")
             newTextNode(``, "br", "activity")
 
             for (y = 0; y < 20; y++) {
                 if (txn[y].date == dates[i]) {
-                    newTextNode(`${txn[y].desc}, ${txn[y].type}$${txn[y].val}, ${txn[y].status}, ${txn[y].time}, ${txn[y].text} ${txn[y].msg} ${txn[y].roundup}`, "p", "activity");
-                    
+                    newTextNode(`${txn[y].desc}, ${txn[y].type}$${txn[y].val}, ${txn[y].status}, ${txn[y].time}, ${txn[y].text} ${txn[y].msg} ${txn[y].roundup}`, "p", "activity");           
                 }
             }
-
+            newTextNode(``, "br", "activity")
             newTextNode(``, "br", "activity")
         }
-
     } else {
         //ERROR
         response = await response.json();
@@ -152,6 +156,11 @@ function newTextNode(newMessage, type , id) {
     let element = document.getElementById(id)
     element.appendChild(p);
 };
+
+function removeDuplicates(dates) {
+    return dates.filter((item,
+        index) => dates.indexOf(item) === index);
+}
 
 function Transaction (description, type, value, status, date, time, text, message, roundup) {
     this.desc = description;
@@ -175,4 +184,30 @@ function Account (name, balance, type, owner) {
 function formatDate(time) {
     let splitTimeDate = time.split("T")
     return splitTimeDate;
+}
+
+function formatTime(time) {
+    let shortTime = time.split("+")
+    let shorterTime = shortTime[0].slice(0,5)
+
+    if (shorterTime.charAt(0) == "0") {
+        shorterTime = shorterTime.slice(1,5);
+    }
+    
+    let newTime = parseFloat(shorterTime.slice(0,2))
+
+    if (newTime < 12) {
+        shorterTime = shorterTime + "am"
+    }
+    else {
+        shorterTime = shorterTime + "pm"
+    }
+
+    if (newTime > 13) {
+        let pmTime = newTime - 12;
+        console.log(pmTime);
+        shorterTime = pmTime + shorterTime.slice(2);
+    }
+
+    return shorterTime;
 }
