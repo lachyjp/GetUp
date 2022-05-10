@@ -107,11 +107,34 @@ async function getTxn(upKey) {
             //new array
             txnArray[i] = new Transaction(txnDesc, txnValType, txnVal, txnStatus, txnDate, txnTime, txnRawText, txnMessage, txnRoundUp);
             txn.push(txnArray[i])
-           
         };
 
+        var dates = [];
         for (i = 0; i < txn.length; i++) {
-            newTextNode(`${txn[i].desc}, ${txn[i].type}$${txn[i].val}, ${txn[i].status}, ${txn[i].date}, ${txn[i].time}, ${txn[i].text} ${txn[i].msg} ${txn[i].roundup}`, "p", "activity");
+            dates.push(txn[i].date);
+        }
+        
+        function removeDuplicates(dates) {
+            return dates.filter((item,
+                index) => dates.indexOf(item) === index);
+        }
+
+        dates = removeDuplicates(dates);
+        console.log(dates);
+
+        for (i = 0; i < dates.length; i++) {
+
+            newTextNode(`${dates[i]}`, "h4", "activity")
+            newTextNode(``, "br", "activity")
+
+            for (y = 0; y < 20; y++) {
+                if (txn[y].date == dates[i]) {
+                    newTextNode(`${txn[y].desc}, ${txn[y].type}$${txn[y].val}, ${txn[y].status}, ${txn[y].time}, ${txn[y].text} ${txn[y].msg} ${txn[y].roundup}`, "p", "activity");
+                    
+                }
+            }
+
+            newTextNode(``, "br", "activity")
         }
 
     } else {
