@@ -38,13 +38,22 @@ async function getAcc(upKey) {
             accArray[i] = new Account(accName, accValue, accType, accOwner);
             account.push(accArray[i]);
 
-            newTextNode(`Your ${account[i].name} balance is $${account[i].balance}, account type is ${account[i].type} and owned by ${account[i].owner}`, "p", "accounts");
+            if (account[i].name == "Spending") {
+                newTextNode(`Your 💸 ${account[i].name} balance is $${account[i].balance}`, "p", "accounts");
+                newTextNode(``, "hr", "accounts");
+            }
+            else {
+                newTextNode(`Your ${account[i].name} balance is $${account[i].balance}, account type is ${account[i].type} and owned by ${account[i].owner}`, "p", "accounts");
+                 newTextNode(``, "hr", "accounts");
+            }
+
+            
             balanceTotal = balanceTotal + account[i].balance;
          };
 
         balanceTotal = balanceTotal.toFixed(2);
 
-        document.getElementById("total-balance").innerHTML = "Your total balance: $" + balanceTotal;
+        document.getElementById("total-balance").innerHTML = `Total &#128175 balance: $${balanceTotal} <hr>`;
 
     } else {
         //ERROR
@@ -202,7 +211,7 @@ function formatTime(time) {
         shorterTime = shorterTime + "pm"
     }
 
-    if (newTime > 13) {
+    if (newTime > 12) {
         let pmTime = newTime - 12;
         console.log(pmTime);
         shorterTime = pmTime + shorterTime.slice(2);
@@ -225,7 +234,7 @@ function addAccordion(desc, type, val, time, status, text, message, roundup, cou
                             </h2>
                             <div id="collapse${count}" class="accordion-collapse collapse">
                             <div class="accordion-body">
-                            Time received: ${time} <br> Status: ${status} <br> Merchant details: ${text} <br> Message: ${message} <br> Round up?: ${roundup}
+                            <span style="font-family: Circular-Black">Time received:</span> ${time} <br> <span style="font-family: Circular-Black">Status:</span> ${status} <br> <span style="font-family: Circular-Black"> Merchant details: </span> ${text} <br> <span style="font-family: Circular-Black"> Message: </span> ${message} <br> <span style="font-family: Circular-Black"> Round up: </span>${roundup}
                             </div>
                             </div>
                         </div> `;

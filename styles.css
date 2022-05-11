@@ -58,9 +58,9 @@ p {
     font-family: Circular-Book;
 }
 
-p.p2 {
-    color: #5c5c5c;
-    font-family: Circular-Book;
+.bold {
+    color: #fbfbfa;
+    font-family: Circular-Bold;
 }
 
 label {
@@ -74,9 +74,9 @@ div.container {
 
 
 
+
 .accordion {
     margin-bottom: 20px;
-    border-color: #e57d68;
 }
 
 .accordion-item {
@@ -87,14 +87,21 @@ div.container {
     background-color: #343444;
     font-family: Circular-Bold;
     color: #fbfbfa;
-    
+}
+
+.accordion-button a{
+    background-color: #343444;
+    font-family: Circular-Bold;
+    color: #fbfbfa;
 }
 
 .accordion-body {
-    background-color: #343444;
+    background-color: #2a2a36;
     color:#ffffff;
     font-family: Circular-Book;
 }
+
+
 
 
 
