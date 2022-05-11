@@ -125,7 +125,7 @@ button.btn.btn-primary {
 footer {
     position: fixed;
     padding-top: 10px;
-    padding-left: 100px;
+    padding-left: 5%;
     background-color: #1b1b27;
     height: 50px;
     bottom: 0;
