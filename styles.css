@@ -58,10 +58,6 @@ p {
     font-family: Circular-Book;
 }
 
-.bold {
-    color: #fbfbfa;
-    font-family: Circular-Bold;
-}
 
 label {
     color: white;
@@ -96,7 +92,7 @@ div.container {
 }
 
 .accordion-body {
-    background-color: #2a2a36;
+    background-color: #343444;
     color:#ffffff;
     font-family: Circular-Book;
 }

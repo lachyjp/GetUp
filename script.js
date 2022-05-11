@@ -43,7 +43,7 @@ async function getAcc(upKey) {
                 newTextNode(``, "hr", "accounts");
             }
             else {
-                newTextNode(`Your ${account[i].name} balance is $${account[i].balance}, account type is ${account[i].type} and owned by ${account[i].owner}`, "p", "accounts");
+                newTextNode(`Your ${account[i].name} balance is $${account[i].balance}`, "p", "accounts");
                  newTextNode(``, "hr", "accounts");
             }
 
