@@ -149,6 +149,9 @@ async function getTxn(upKey) {
             newTextNode(``, "br", "activity")
             newTextNode(``, "br", "activity")
         }
+
+    document.getElementById("thebutton").remove();
+    
     } else {
         //ERROR
         response = await response.json();
