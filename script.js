@@ -94,13 +94,13 @@ async function getTxn(upKey) {
                 txnValType = "+";
             };
             if (txnRawText == null) {
-                txnRawText = "";
+                txnRawText = "N/A";
             };
             if (txnMessage == null) {
-                txnMessage = "";
+                txnMessage = "N/A";
             };
             if (txnRoundUp == null) {
-                txnRoundUp = "";
+                txnRoundUp = "false";
             };
 
             //Push transactions as objects
@@ -131,11 +131,10 @@ async function getTxn(upKey) {
         //Print transactions
         for (i = 0; i < dates.length; i++) {
             newTextNode(`${newDate[i]}`, "h4", "activity")
-            newTextNode(``, "br", "activity")
 
             for (y = 0; y < 20; y++) {
-                if (txn[y].date == dates[i]) {
-                    newTextNode(`${txn[y].desc}, ${txn[y].type}$${txn[y].val}, ${txn[y].status}, ${txn[y].time}, ${txn[y].text} ${txn[y].msg} ${txn[y].roundup}`, "p", "activity");           
+                if (txn[y].date == dates[i]) {     
+                    addAccordion(txn[y].desc, txn[y].type, txn[y].val, txn[y].time, txn[y].status, txn[y].text, txn[y].msg, txn[y].roundup, y);   
                 }
             }
             newTextNode(``, "br", "activity")
@@ -210,4 +209,26 @@ function formatTime(time) {
     }
 
     return shorterTime;
+}
+
+////////////////
+function addAccordion(desc, type, val, time, status, text, message, roundup, count) {
+    var accordion = document.createElement('div');
+    accordion.className = 'panel-group';
+    accordion.id = 'accordion';
+
+    accordion.innerHTML = `<div class="accordion-item">
+                            <h2 class="accordion-header">
+                            <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#collapse${count}">
+                                ${desc} / ${type}$${val}         
+                            </button>
+                            </h2>
+                            <div id="collapse${count}" class="accordion-collapse collapse">
+                            <div class="accordion-body">
+                            Time received: ${time} <br> Status: ${status} <br> Merchant details: ${text} <br> Message: ${message} <br> Round up?: ${roundup}
+                            </div>
+                            </div>
+                        </div> `;
+
+    document.getElementById('activity').appendChild(accordion);
 }
