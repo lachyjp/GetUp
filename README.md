@@ -4,7 +4,7 @@ Project hosted at https://lachyjp.github.io/GetUp/
 
 Up Bank is an Australian neobank owned by Bendigo/Adelaide bank that is currently mobile-app exclusive and does not have a web/desktop solution for users, this project aims to fill that gap.
 
-This is a simple javascript-based project allowing members of Up Bank to view their current account balances and latest transactions on a locally run webpage or at https://lachyjp.github.io/GetUp/ 
+This is a simple javascript-based project allowing members of Up Bank to view their current account balances and latest transactions on a locally run webpage or at the link above.
 
 ## Privacy
 This script does not store or transmit any personal data. Do not share your Up API key. Store your key safely as per Up's guidelines.
