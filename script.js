@@ -44,7 +44,7 @@ async function getAcc(upKey) {
             }
             else {
                 newTextNode(`Your ${account[i].name} balance is $${account[i].balance}`, "p", "accounts");
-                 newTextNode(``, "hr", "accounts");
+                newTextNode(``, "hr", "accounts");
             }
 
             
@@ -151,6 +151,7 @@ async function getTxn(upKey) {
         }
 
     document.getElementById("thebutton").remove();
+    console.log(countTransactions(txn));
     
     } else {
         //ERROR
@@ -216,14 +217,11 @@ function formatTime(time) {
 
     if (newTime > 12) {
         let pmTime = newTime - 12;
-        console.log(pmTime);
         shorterTime = pmTime + shorterTime.slice(2);
     }
-
     return shorterTime;
 }
 
-////////////////
 function addAccordion(desc, type, val, time, status, text, message, roundup, count) {
     var accordion = document.createElement('div');
     accordion.className = 'panel-group';
@@ -243,4 +241,81 @@ function addAccordion(desc, type, val, time, status, text, message, roundup, cou
                         </div> `;
 
     document.getElementById('activity').appendChild(accordion);
+}
+
+//Find the sum of transactions in the array
+//only count transactions with type = ""
+//and round it to 2 decimal places
+function countTransactions(txn) {
+    let sum = 0;
+    for (i = 0; i < txn.length; i++) {
+        if (txn[i].type == "") {
+            //don't count transactions with description = "Transfer to Savings"
+            if (txn[i].desc != "Transfer to Savings") {
+                sum = sum + txn[i].val;
+            }
+        }
+    }
+    //round sum to 2 decimal places
+    sum = sum.toFixed(2);
+
+    //get the amount of days between the first and last transaction
+    let firstDate = txn[0].date;
+    let lastDate = txn[txn.length-1].date;
+    let firstDateSplit = firstDate.split("-");
+    let lastDateSplit = lastDate.split("-");
+    let firstDay = parseFloat(firstDateSplit[2]);
+    let firstMonth = parseFloat(firstDateSplit[1]);
+    let firstYear = parseFloat(firstDateSplit[0]);
+    let lastDay = parseFloat(lastDateSplit[2]);
+    let lastMonth = parseFloat(lastDateSplit[1]);
+    let lastYear = parseFloat(lastDateSplit[0]);
+    let daysBetween = 0;
+
+    if (firstYear == lastYear) {
+        if (firstMonth == lastMonth) {
+            daysBetween = lastDay - firstDay;
+        }
+        else {
+            daysBetween = lastDay - firstDay;
+            for (i = firstMonth+1; i < lastMonth; i++) {
+                daysBetween = daysBetween + daysInMonth(i, firstYear);
+            }
+        }
+    }
+    else {
+        daysBetween = lastDay - firstDay;
+        for (i = firstMonth+1; i < 12; i++) {
+            daysBetween = daysBetween + daysInMonth(i, firstYear);
+        }
+        for (i = 1; i < lastMonth; i++) {
+            daysBetween = daysBetween + daysInMonth(i, lastYear);
+        }
+        for (i = firstYear+1; i < lastYear; i++) {
+            daysBetween = daysBetween + daysInMonth(12, i);
+        }
+    }
+    //format daysBetween to positive integer
+    if (daysBetween < 0) {
+        daysBetween = daysBetween * -1;
+    }
+    console.log(daysBetween);
+
+    //create a new element to hold the sum below the "activity" element
+    let sumElement = document.createElement('div');
+    sumElement.innerHTML = `<div class="accordion-item">
+                            <h2 class="accordion-header">
+                            <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#collapse${i}">
+                                Total spent: $${sum} over the last ${daysBetween} days
+                            </button>
+                            </h2>
+                            <div id="collapse${i}" class="accordion-collapse collapse">
+                            <div class="accordion-body">
+                            </div>
+                            </div>
+                        </div>
+                        <br> `;
+
+    document.getElementById('totalSpent').appendChild(sumElement);
+    return sum;
 }
