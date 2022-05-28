@@ -1,5 +1,5 @@
 const accURL = "https://api.up.com.au/api/v1/accounts";
-const txnURL = "https://api.up.com.au/api/v1/transactions";
+let txnURL = "https://api.up.com.au/api/v1/transactions?page[size]=";
 const httpAccStatus = ['acc-status-successful', 'acc-status-failed'];
 const httpTxnStatus = ['txn-status-successful', 'txn-status-failed'];
 const authStatus = ['auth-status-successful', 'auth-status-failed'];
@@ -7,8 +7,18 @@ const months = ['January', 'February', 'March', 'April', 'May', 'June', 'July', 
 
 function submitUpKey() {
     let upKey = document.getElementById("upKeyInput").value;
+    let txnUserAmount = document.getElementById("txnUserAmountInput").value;
+    let userName = document.getElementById("userNameInput").value;
+
+    //if txnUserAmount is null, set to 20
+    if (txnUserAmount == "") {
+        txnUserAmount = 20;
+    }
+
     getAcc(upKey);
-    getTxn(upKey);
+    getTxn(upKey, txnUserAmount);
+    newTextNode(`Welcome, ${userName}!`, "h1", "user-name");
+    newTextNode(``, "br", "user-name");
 };
 
 async function getAcc(upKey) {
@@ -63,8 +73,8 @@ async function getAcc(upKey) {
     };
 };
 
-async function getTxn(upKey) {
-    let response = await fetch(txnURL, {
+async function getTxn(upKey, txnUserAmount) {
+    let response = await fetch(txnURL + txnUserAmount, {
         headers: {
             Authorization: 'Bearer ' + upKey
         }
@@ -141,18 +151,19 @@ async function getTxn(upKey) {
         for (i = 0; i < dates.length; i++) {
             newTextNode(`${newDate[i]}`, "h4", "activity")
 
-            for (y = 0; y < 20; y++) {
+            for (y = 0; y < txn.length; y++) {
                 if (txn[y].date == dates[i]) {     
                     addAccordion(txn[y].desc, txn[y].type, txn[y].val, txn[y].time, txn[y].status, txn[y].text, txn[y].msg, txn[y].roundup, y);   
                 }
             }
             newTextNode(``, "br", "activity")
             newTextNode(``, "br", "activity")
-        }
+        }   
 
-    document.getElementById("thebutton").remove();
-    console.log(countTransactions(txn));
+    countTransactions(txn);
+    countMerchants(txn);
     
+    document.getElementById("thebutton").remove();
     } else {
         //ERROR
         response = await response.json();
@@ -243,79 +254,76 @@ function addAccordion(desc, type, val, time, status, text, message, roundup, cou
     document.getElementById('activity').appendChild(accordion);
 }
 
-//Find the sum of transactions in the array
-//only count transactions with type = ""
-//and round it to 2 decimal places
+//calculate the sum of all transactions not including transactions with descriptions containing "Transfer" in them
 function countTransactions(txn) {
     let sum = 0;
     for (i = 0; i < txn.length; i++) {
-        if (txn[i].type == "") {
-            //don't count transactions with description = "Transfer to Savings"
-            if (txn[i].desc != "Transfer to Savings") {
-                sum = sum + txn[i].val;
-            }
+        if (txn[i].desc.includes("Transfer") == false) {
+            sum = sum + txn[i].val;
         }
     }
-    //round sum to 2 decimal places
-    sum = sum.toFixed(2);
 
-    //get the amount of days between the first and last transaction
+    //calculate the total of all transactions that include a type of "+"
+    let sumPlus = 0;
+    for (i = 0; i < txn.length; i++) {
+        if (txn[i].desc.includes("Transfer") == false && txn[i].type == "+") {
+            sumPlus = sumPlus + txn[i].val;
+        }
+    }
+
+    //minus sumPlus from sum   
+    let sumMinus = sum - sumPlus;
+
+    console.log(sum, sumPlus, sumMinus);
+
+    //round sumMinus to 2 decimal places
+    sumMinus = sumMinus.toFixed(2);
+
+    //calculate the amount of days between the first and last transactions
     let firstDate = txn[0].date;
     let lastDate = txn[txn.length-1].date;
     let firstDateSplit = firstDate.split("-");
     let lastDateSplit = lastDate.split("-");
-    let firstDay = parseFloat(firstDateSplit[2]);
-    let firstMonth = parseFloat(firstDateSplit[1]);
-    let firstYear = parseFloat(firstDateSplit[0]);
-    let lastDay = parseFloat(lastDateSplit[2]);
-    let lastMonth = parseFloat(lastDateSplit[1]);
-    let lastYear = parseFloat(lastDateSplit[0]);
-    let daysBetween = 0;
+    let firstDateYear = firstDateSplit[0];
+    let firstDateMonth = firstDateSplit[1];
+    let firstDateDay = firstDateSplit[2];
+    let lastDateYear = lastDateSplit[0];
+    let lastDateMonth = lastDateSplit[1];
+    let lastDateDay = lastDateSplit[2];
+    let firstDateDate = new Date(firstDateYear, firstDateMonth, firstDateDay);
+    let lastDateDate = new Date(lastDateYear, lastDateMonth, lastDateDay);
+    let daysBetween = Math.round((lastDateDate - firstDateDate) / (1000 * 60 * 60 * 24));
 
-    if (firstYear == lastYear) {
-        if (firstMonth == lastMonth) {
-            daysBetween = lastDay - firstDay;
-        }
-        else {
-            daysBetween = lastDay - firstDay;
-            for (i = firstMonth+1; i < lastMonth; i++) {
-                daysBetween = daysBetween + daysInMonth(i, firstYear);
-            }
+    //calculate the average amount of transactions per day using sumMinus
+    let average = sumMinus / daysBetween;
+
+    //round average to 2 decimal places
+    average = average.toFixed(2);
+    //convert to positive number
+    average = Math.abs(average);
+
+    //convert daysBetween to a positive number
+    daysBetween = Math.abs(daysBetween);
+
+    newTextNode(`$${sumMinus} spent over the last ${daysBetween} days`, "p", "totalSpent")
+    newTextNode(``, "hr", "totalSpent")
+
+    newTextNode(`$${average} average spent per day`, "p", "totalSpent")
+    newTextNode(``, "hr", "totalSpent")
+}
+
+
+//count the amount of unique merchants
+//do not include merchants with a description of "Transfer from Spending" or "Transfer to Savings" or "Beem"
+function countMerchants(txn) {
+    let uniqueMerchants = [];
+    for (i = 0; i < txn.length; i++) {
+        if (txn[i].desc != "Transfer from Spending" && txn[i].desc != "Transfer to Savings" && txn[i].desc != "Beem") {
+            uniqueMerchants.push(txn[i].text);
         }
     }
-    else {
-        daysBetween = lastDay - firstDay;
-        for (i = firstMonth+1; i < 12; i++) {
-            daysBetween = daysBetween + daysInMonth(i, firstYear);
-        }
-        for (i = 1; i < lastMonth; i++) {
-            daysBetween = daysBetween + daysInMonth(i, lastYear);
-        }
-        for (i = firstYear+1; i < lastYear; i++) {
-            daysBetween = daysBetween + daysInMonth(12, i);
-        }
-    }
-    //format daysBetween to positive integer
-    if (daysBetween < 0) {
-        daysBetween = daysBetween * -1;
-    }
-    console.log(daysBetween);
-
-    //create a new element to hold the sum below the "activity" element
-    let sumElement = document.createElement('div');
-    sumElement.innerHTML = `<div class="accordion-item">
-                            <h2 class="accordion-header">
-                            <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#collapse${i}">
-                                Total spent: $${sum} over the last ${daysBetween} days
-                            </button>
-                            </h2>
-                            <div id="collapse${i}" class="accordion-collapse collapse">
-                            <div class="accordion-body">
-                            </div>
-                            </div>
-                        </div>
-                        <br> `;
-
-    document.getElementById('totalSpent').appendChild(sumElement);
-    return sum;
+    let uniqueMerchantsCount = removeDuplicates(uniqueMerchants).length;
+    newTextNode(`${uniqueMerchantsCount} unique merchants`, "p", "totalSpent")
+    newTextNode(``, "hr", "totalSpent")
+    newTextNode(``, "br", "totalSpent")
 }
