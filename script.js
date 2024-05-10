@@ -38,7 +38,7 @@ async function getAcc(upKey) {
         var account = [];
         var accArray = [];
 
-        for (i = 0; i < obj.data.length; i++) {
+        for (i = 0; i < 1; i++) {
             let accName = obj.data[i].attributes.displayName;
             let accValue = parseFloat(obj.data[i].attributes.balance.value);
             let accType = obj.data[i].attributes.accountType;
