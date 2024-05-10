@@ -12,7 +12,7 @@ function submitUpKey() {
 
     //if txnUserAmount is null, set to 20
     if (txnUserAmount == "") {
-        txnUserAmount = 20;
+        txnUserAmount = 5;
     }
 
     getAcc(upKey);
