@@ -1,10 +1,13 @@
+//This API URL allows me to grab my accounts details
 const accURL = "https://api.up.com.au/api/v1/accounts";
+//This gets my transactions. It's a let because [size]= at the end of the URL lets me choose how many transactions I want to grab
 let txnURL = "https://api.up.com.au/api/v1/transactions?page[size]=";
 const httpAccStatus = ['acc-status-successful', 'acc-status-failed'];
 const httpTxnStatus = ['txn-status-successful', 'txn-status-failed'];
 const authStatus = ['auth-status-successful', 'auth-status-failed'];
 const months = ['January', 'February', 'March', 'April', 'May', 'June', 'July', 'August', 'September', 'October', 'November', 'December']
 
+// Lets me create transaction objects
 class Transaction {
     constructor(description, type, value, status, date, time, text, message, roundup) {
         this.desc = description;
@@ -19,6 +22,7 @@ class Transaction {
     }
 }
 
+//Create account objects
 class Account {
     constructor(name, balance, type, owner) {
         this.name = name;
@@ -28,6 +32,11 @@ class Account {
     }
 }
 
+//A reusable function I can use to add HTML anywhere, the parameters are: n
+//NewMessage = "string of whatever i want", 
+//type = the type of element e.g. "p" or "h1", 
+//id = what element in my html (identified by css) will I manipulate e.g. "user-name" span id)
+//e.g. use case: newTextNode(`Welcome, ${userName}!`, "h1", "user-name");
 function newTextNode(newMessage, type , id) {
     let p = document.createElement(type);
     let node = document.createTextNode(newMessage);
@@ -36,6 +45,7 @@ function newTextNode(newMessage, type , id) {
     element.appendChild(p);
 };
 
+//the same concept as above, but instead using .innerHTML to ADD an element with many lines e.g. an accordion. 
 function addAccordion(desc, type, val, time, status, text, message, roundup, count) {
     var accordion = document.createElement('div');
     accordion.className = 'panel-group';
@@ -57,14 +67,15 @@ function addAccordion(desc, type, val, time, status, text, message, roundup, cou
     document.getElementById('activity').appendChild(accordion);
 }
 
+//Dialog popup to enter API key and # of transactions
 function submitUpKey() {
     let upKey = document.getElementById("upKeyInput").value;
     let txnUserAmount = document.getElementById("txnUserAmountInput").value;
     let userName = document.getElementById("userNameInput").value;
 
-    //if txnUserAmount is null, set to 20
+    //if txnUserAmount is null, set to 3 for demo
     if (txnUserAmount == "") {
-        txnUserAmount = 5;
+        txnUserAmount = 7;
     }
 
     getAcc(upKey);
@@ -73,6 +84,10 @@ function submitUpKey() {
     newTextNode(``, "br", "user-name");
 };
 
+//The actual API call for my accounts
+//1. Grabs my accounts e.g. spending, savings etc. and its details
+//2. Puts them into an array
+//3. Creates a new text node for each account and pushes to 'accounts' span-ID in my HTML
 async function getAcc(upKey) {
     let response = await fetch(accURL, {
         headers: {
@@ -125,6 +140,8 @@ async function getAcc(upKey) {
     };
 };
 
+//Same as above but for my transactions which has more details like descriptions, dates, times, etc.
+//Except I use the addAccordion function I made instead 
 async function getTxn(upKey, txnUserAmount) {
     let response = await fetch(txnURL + txnUserAmount, {
         headers: {
@@ -141,7 +158,7 @@ async function getTxn(upKey, txnUserAmount) {
         var txnArray = [];
 
         //ADD TRANSACTIONS
-        for (i = 0; i < obj.data.length; i++) {
+        for (i = 4; i < obj.data.length; i++) {
             let txnDesc = obj.data[i].attributes.description;
             let txnValType = "";
             let txnVal = parseFloat(obj.data[i].attributes.amount.value);
@@ -175,6 +192,7 @@ async function getTxn(upKey, txnUserAmount) {
             };
 
             //Push transactions as objects
+
             txnArray[i] = new Transaction(txnDesc, txnValType, txnVal, txnStatus, txnDate, txnTime, txnRawText, txnMessage, txnRoundUp);
             txn.push(txnArray[i])
         };
@@ -223,7 +241,6 @@ async function getTxn(upKey, txnUserAmount) {
         console.log(response);
     };
 };
-
 
 function removeDuplicates(dates) {
     return dates.filter((item,
