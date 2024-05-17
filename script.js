@@ -5,6 +5,58 @@ const httpTxnStatus = ['txn-status-successful', 'txn-status-failed'];
 const authStatus = ['auth-status-successful', 'auth-status-failed'];
 const months = ['January', 'February', 'March', 'April', 'May', 'June', 'July', 'August', 'September', 'October', 'November', 'December']
 
+class Transaction {
+    constructor(description, type, value, status, date, time, text, message, roundup) {
+        this.desc = description;
+        this.type = type;
+        this.val = value;
+        this.status = status;
+        this.date = date;
+        this.time = time;
+        this.text = text;
+        this.msg = message;
+        this.roundup = roundup;
+    }
+}
+
+class Account {
+    constructor(name, balance, type, owner) {
+        this.name = name;
+        this.balance = balance;
+        this.type = type;
+        this.owner = owner;
+    }
+}
+
+function newTextNode(newMessage, type , id) {
+    let p = document.createElement(type);
+    let node = document.createTextNode(newMessage);
+    p.appendChild(node);
+    let element = document.getElementById(id)
+    element.appendChild(p);
+};
+
+function addAccordion(desc, type, val, time, status, text, message, roundup, count) {
+    var accordion = document.createElement('div');
+    accordion.className = 'panel-group';
+    accordion.id = 'accordion';
+
+    accordion.innerHTML = `<div class="accordion-item">
+                            <h2 class="accordion-header">
+                            <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#collapse${count}">
+                                ${desc} / ${type}$${val}         
+                            </button>
+                            </h2>
+                            <div id="collapse${count}" class="accordion-collapse collapse">
+                            <div class="accordion-body">
+                            <span style="font-family: Circular-Black">Time received:</span> ${time} <br> <span style="font-family: Circular-Black">Status:</span> ${status} <br> <span style="font-family: Circular-Black"> Merchant details: </span> ${text} <br> <span style="font-family: Circular-Black"> Message: </span> ${message} <br> <span style="font-family: Circular-Black"> Round up: </span>${roundup}
+                            </div>
+                            </div>
+                        </div> `;
+
+    document.getElementById('activity').appendChild(accordion);
+}
+
 function submitUpKey() {
     let upKey = document.getElementById("upKeyInput").value;
     let txnUserAmount = document.getElementById("txnUserAmountInput").value;
@@ -172,36 +224,10 @@ async function getTxn(upKey, txnUserAmount) {
     };
 };
 
-function newTextNode(newMessage, type , id) {
-    let p = document.createElement(type);
-    let node = document.createTextNode(newMessage);
-    p.appendChild(node);
-    let element = document.getElementById(id)
-    element.appendChild(p);
-};
 
 function removeDuplicates(dates) {
     return dates.filter((item,
         index) => dates.indexOf(item) === index);
-}
-
-function Transaction (description, type, value, status, date, time, text, message, roundup) {
-    this.desc = description;
-    this.type = type;
-    this.val = value;
-    this.status = status;
-    this.date = date;
-    this.time = time;
-    this.text = text;
-    this.msg = message;
-    this.roundup = roundup;
-}
-
-function Account (name, balance, type, owner) {
-    this.name = name;
-    this.balance = balance;
-    this.type = type;
-    this.owner = owner;
 }
 
 function formatDate(time) {
@@ -231,27 +257,6 @@ function formatTime(time) {
         shorterTime = pmTime + shorterTime.slice(2);
     }
     return shorterTime;
-}
-
-function addAccordion(desc, type, val, time, status, text, message, roundup, count) {
-    var accordion = document.createElement('div');
-    accordion.className = 'panel-group';
-    accordion.id = 'accordion';
-
-    accordion.innerHTML = `<div class="accordion-item">
-                            <h2 class="accordion-header">
-                            <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#collapse${count}">
-                                ${desc} / ${type}$${val}         
-                            </button>
-                            </h2>
-                            <div id="collapse${count}" class="accordion-collapse collapse">
-                            <div class="accordion-body">
-                            <span style="font-family: Circular-Black">Time received:</span> ${time} <br> <span style="font-family: Circular-Black">Status:</span> ${status} <br> <span style="font-family: Circular-Black"> Merchant details: </span> ${text} <br> <span style="font-family: Circular-Black"> Message: </span> ${message} <br> <span style="font-family: Circular-Black"> Round up: </span>${roundup}
-                            </div>
-                            </div>
-                        </div> `;
-
-    document.getElementById('activity').appendChild(accordion);
 }
 
 //calculate the sum of all transactions not including transactions with descriptions containing "Transfer" in them
@@ -311,7 +316,6 @@ function countTransactions(txn) {
     newTextNode(`$${average} average spent per day`, "p", "totalSpent")
     newTextNode(``, "hr", "totalSpent")
 }
-
 
 //count the amount of unique merchants
 //do not include merchants with a description of "Transfer from Spending" or "Transfer to Savings" or "Beem"
