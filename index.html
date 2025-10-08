@@ -9,12 +9,19 @@
     <!-- Titles/JS -->
     <title>GetUp ↑</title>
     <link rel="icon" type="image/x-icon" href="images/favicon.ico"/>
+    <link rel="manifest" href="manifest.json">
+    <meta name="theme-color" content="#e57d68">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+    <meta name="apple-mobile-web-app-title" content="GetUp">
+    <link rel="apple-touch-icon" href="images/favicon.ico">
     <link rel="stylesheet" href="styles.css">
     <!-- Load modules in dependency order -->
     <script src="utils.js"></script>
     <script src="data.js"></script>
     <script src="ui.js"></script>
     <script src="api.js"></script>
+    <script src="advanced-features.js"></script>
     <script src="main.js"></script>
     <meta http-equiv='cache-control' content='no-cache'>
     <meta http-equiv='expires' content='0'>
@@ -197,12 +204,14 @@
             </div>
         </div>
         <!-- Button trigger modal -->
-        <button id="thebutton" type="button" class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#exampleModal">
+        <button id="thebutton" type="button" class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#exampleModal" 
+                aria-label="Open login modal to enter API key and user details">
             Log in
         </button>
         
         <!-- Refresh button (hidden initially) -->
-        <button id="refreshButton" type="button" class="btn btn-secondary" style="display: none;" onclick="refreshData()">
+        <button id="refreshButton" type="button" class="btn btn-secondary" style="display: none;" onclick="refreshData()"
+                aria-label="Refresh account and transaction data">
             🔄 Refresh Data
         </button>
         <!-- Modal -->
@@ -214,16 +223,20 @@
                 <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
                 </div>
                 <div class="modal-body">
-                    <p style="color:black">Your name</p>
-                    <input type="email" id="userNameInput" autocomplete="on">
+                    <label for="userNameInput" style="color:black">Your name</label>
+                    <input type="text" id="userNameInput" autocomplete="name" aria-describedby="nameHelp" required>
+                    <small id="nameHelp" class="form-text text-muted">Enter your name for personalization</small>
                 </div>
                 <div class="modal-body">
-                    <p style="color:black">Enter your API key below</p>
-                    <input type="password" id="upKeyInput" autocomplete="on">
+                    <label for="upKeyInput" style="color:black">Enter your Up API key below</label>
+                    <input type="password" id="upKeyInput" autocomplete="off" aria-describedby="keyHelp" required>
+                    <small id="keyHelp" class="form-text text-muted">Get your API key from the Up mobile app</small>
                 </div>
                 <div class="modal-body">
-                    <p style="color:black">Amount of transactions to view (1-100)</p>
-                    <input type="number" placeholder="default is 20 txns" id="txnUserAmountInput" autocomplete="on">
+                    <label for="txnUserAmountInput" style="color:black">Amount of transactions to view (1-100)</label>
+                    <input type="number" placeholder="default is 20 txns" id="txnUserAmountInput" 
+                           autocomplete="off" min="1" max="100" aria-describedby="txnHelp">
+                    <small id="txnHelp" class="form-text text-muted">Choose how many recent transactions to display</small>
                 </div>
                 <div class="modal-footer">
                 <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
@@ -263,6 +276,17 @@
             <p><span id="activity"></span></p>
             <p><span id="uniqueMerchants"></span></p>
             <br><br><br>
+        </div>
+
+        <!-- Advanced Features !-->
+        <div class="divAdvanced" style="display: none;">
+            <h2>📊 Advanced Features</h2>
+            <hr>
+            <div id="categories"></div>
+            <div id="tags"></div>
+            <button id="loadAdvancedBtn" class="btn btn-outline-primary" onclick="loadAdvancedFeatures(currentUpKey)">
+                Load Categories & Tags
+            </button>
         </div>
     </div>
 

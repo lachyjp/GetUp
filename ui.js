@@ -137,6 +137,70 @@ function displaySpendingStats(stats, uniqueMerchantsCount) {
     newTextNode("", "br", "totalSpent");
 }
 
+// Enhanced notification system with animations
+function showNotification(message, type = 'info', duration = 3000) {
+    const notificationDiv = document.createElement('div');
+    const typeClass = type === 'success' ? 'alert-success' : type === 'error' ? 'alert-danger' : 'alert-info';
+    
+    notificationDiv.className = `alert ${typeClass} notification`;
+    notificationDiv.style.cssText = `
+        position: fixed; 
+        top: 20px; 
+        right: 20px; 
+        z-index: 9999; 
+        max-width: 400px;
+        opacity: 0;
+        transform: translateX(100%);
+        transition: all 0.3s ease-in-out;
+        box-shadow: 0 4px 12px rgba(0,0,0,0.3);
+        border-radius: 8px;
+        margin-bottom: 10px;
+    `;
+    
+    const icon = type === 'success' ? '✅' : type === 'error' ? '❌' : 'ℹ️';
+    notificationDiv.innerHTML = `
+        <strong>${icon}</strong> ${message}
+        <button type="button" class="btn-close" onclick="this.parentElement.remove()" 
+                style="float: right; background: none; border: none; font-size: 20px; cursor: pointer; color: inherit;">&times;</button>
+    `;
+    
+    document.body.appendChild(notificationDiv);
+    
+    // Animate in
+    requestAnimationFrame(() => {
+        notificationDiv.style.opacity = '1';
+        notificationDiv.style.transform = 'translateX(0)';
+    });
+    
+    // Auto-remove with animation
+    setTimeout(() => {
+        if (notificationDiv.parentElement) {
+            notificationDiv.style.opacity = '0';
+            notificationDiv.style.transform = 'translateX(100%)';
+            setTimeout(() => {
+                if (notificationDiv.parentElement) {
+                    notificationDiv.remove();
+                }
+            }, 300);
+        }
+    }, duration);
+}
+
+// Add loading animation to elements
+function addLoadingAnimation(elementId, text = 'Loading...') {
+    const element = DOM_CACHE.getElement(elementId);
+    if (element) {
+        element.innerHTML = `
+            <div class="loading-spinner">
+                <div class="spinner-border text-primary" role="status">
+                    <span class="sr-only">${text}</span>
+                </div>
+                <span class="ms-2">${text}</span>
+            </div>
+        `;
+    }
+}
+
 // Clear all displayed data with optimized DOM access
 function clearDisplay() {
     const elementsToClear = [

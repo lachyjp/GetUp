@@ -1,6 +1,15 @@
-// Utility functions for the GetUp application
+/**
+ * Utility functions for the GetUp application
+ * @fileoverview Contains helper functions for error handling, validation, and data processing
+ */
 
-// Utility function for handling API errors
+/**
+ * Handles API errors and displays user-friendly error messages
+ * @param {Object} response - The API error response object
+ * @param {string} statusElementId - The DOM element ID to display the error message
+ * @example
+ * handleApiError({errors: [{status: 401, title: 'Unauthorized'}]}, 'error-display');
+ */
 function handleApiError(response, statusElementId) {
     const errorElement = document.getElementById(statusElementId);
     let errorMessage = '';
@@ -42,7 +51,17 @@ function hideLoadingState(loadingElementId) {
     document.getElementById(loadingElementId).style.display = 'none';
 }
 
-// Security utility functions
+/**
+ * Security utility functions
+ */
+
+/**
+ * Sanitizes user input to prevent XSS attacks
+ * @param {string} input - The input string to sanitize
+ * @returns {string} The sanitized input string
+ * @example
+ * sanitizeInput('<script>alert("xss")</script>'); // Returns 'alert("xss")'
+ */
 function sanitizeInput(input) {
     if (typeof input !== 'string') return '';
     

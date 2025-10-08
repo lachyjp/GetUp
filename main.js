@@ -120,9 +120,34 @@ const refreshData = async () => {
     }
 };
 
+// PWA Service Worker Registration
+async function registerServiceWorker() {
+    if ('serviceWorker' in navigator) {
+        try {
+            const registration = await navigator.serviceWorker.register('/sw.js');
+            console.log('Service Worker registered successfully:', registration);
+            
+            // Handle updates
+            registration.addEventListener('updatefound', () => {
+                const newWorker = registration.installing;
+                newWorker.addEventListener('statechange', () => {
+                    if (newWorker.state === 'installed' && navigator.serviceWorker.controller) {
+                        showNotification('App update available! Refresh to get the latest version.', 'info', 10000);
+                    }
+                });
+            });
+        } catch (error) {
+            console.error('Service Worker registration failed:', error);
+        }
+    }
+}
+
 // Initialize the application when the page loads using modern JS
 document.addEventListener('DOMContentLoaded', () => {
     console.log('GetUp application loaded successfully');
+    
+    // Register service worker for PWA functionality
+    registerServiceWorker();
     
     // Add any initialization code here if needed
     // For example, setting up event listeners, initializing UI state, etc.

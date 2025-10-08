@@ -41,16 +41,63 @@ function clearCache() {
     API_CONFIG.cache.lastFetch = null;
 }
 
-// Fetch accounts data from Up API
+// Retry configuration
+const RETRY_CONFIG = {
+    maxRetries: 3,
+    baseDelay: 1000, // 1 second
+    maxDelay: 10000, // 10 seconds
+    backoffMultiplier: 2
+};
+
+// Exponential backoff retry function
+async function retryWithBackoff(fn, context = 'API call') {
+    let lastError;
+    
+    for (let attempt = 0; attempt <= RETRY_CONFIG.maxRetries; attempt++) {
+        try {
+            return await fn();
+        } catch (error) {
+            lastError = error;
+            
+            if (attempt === RETRY_CONFIG.maxRetries) {
+                console.error(`${context} failed after ${RETRY_CONFIG.maxRetries + 1} attempts:`, error);
+                throw error;
+            }
+            
+            const delay = Math.min(
+                RETRY_CONFIG.baseDelay * Math.pow(RETRY_CONFIG.backoffMultiplier, attempt),
+                RETRY_CONFIG.maxDelay
+            );
+            
+            console.warn(`${context} attempt ${attempt + 1} failed, retrying in ${delay}ms...`);
+            showNotification(`Retrying ${context.toLowerCase()}... (attempt ${attempt + 2})`, 'info', 2000);
+            
+            await new Promise(resolve => setTimeout(resolve, delay));
+        }
+    }
+    
+    throw lastError;
+}
+
+// Fetch accounts data from Up API with retry logic
 async function fetchAccounts(upKey) {
     showLoadingState('acc-status-loading');
     
     try {
-        const response = await fetch(API_CONFIG.accountsUrl, {
-            headers: {
-                Authorization: 'Bearer ' + upKey
+        const response = await retryWithBackoff(async () => {
+            const res = await fetch(API_CONFIG.accountsUrl, {
+                headers: {
+                    Authorization: 'Bearer ' + upKey
+                },
+                signal: AbortSignal.timeout(30000) // 30 second timeout
+            });
+            
+            if (!res.ok) {
+                throw new Error(`HTTP ${res.status}: ${res.statusText}`);
             }
-        });
+            
+            return res;
+        }, 'Accounts fetch');
 
         if (response.status >= 200 && response.status <= 299) {
             const obj = await response.json();
