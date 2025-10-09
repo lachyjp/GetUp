@@ -168,21 +168,22 @@ const LoginForm: React.FC<LoginFormProps> = ({ onLogin }) => {
                 </div>
               )}
 
-              <div className="mb-3">
-                <div className="form-check form-switch">
-                  <input
-                    className="form-check-input"
-                    type="checkbox"
-                    id="rememberMe"
-                    checked={rememberMe}
-                    onChange={(e) => setRememberMe(e.target.checked)}
-                    disabled={hasSavedKey}
-                  />
-                  <label className="form-check-label" htmlFor="rememberMe">
-                    Remember this API key on this device (encrypted with a PIN)
-                  </label>
+              {!hasSavedKey && (
+                <div className="mb-3">
+                  <div className="form-check form-switch">
+                    <input
+                      className="form-check-input"
+                      type="checkbox"
+                      id="rememberMe"
+                      checked={rememberMe}
+                      onChange={(e) => setRememberMe(e.target.checked)}
+                    />
+                    <label className="form-check-label" htmlFor="rememberMe">
+                      Remember this API key on this device (encrypted with a PIN)
+                    </label>
+                  </div>
                 </div>
-              </div>
+              )}
 
               {(rememberMe || hasSavedKey) && (
                 <div className="mb-3">
