@@ -39,6 +39,13 @@ body {
     padding: 2rem;
 }
 
+/* Gutter background to match page, prevents visual bands between columns */
+.container .row.g-3 {
+    background-color: #24242f;
+    position: relative;
+    z-index: 0;
+}
+
 h1 {
     color: #e57d68;
     font-family: 'Circular-Black', sans-serif;
@@ -79,9 +86,11 @@ label {
     background-color: #343444;
     border: 1px solid #2d2d3b;
     color: #fbfbfa;
-    border-radius: 12px;
+    border-radius: 14px; /* match transactions card rounding */
     margin-bottom: 1.25rem; /* extra space between cards */
-    box-shadow: 0 6px 18px rgba(0,0,0,0.2);
+    /* tone down global shadow to avoid dark bands between sections */
+    box-shadow: 0 2px 8px rgba(0,0,0,0.18);
+    overflow: hidden; /* clip interior shadows/gradients to the card */
 }
 
 .card-header {
@@ -221,7 +230,32 @@ label {
 .account-card {
     background-color: #343444;
     border: 1px solid #2d2d3b;
-    border-radius: 12px;
+.column-clip {
+    position: relative;
+    overflow: visible; /* ensure gutter doesn't visually overlap cards */
+    z-index: 0;
+}
+
+.accounts-card {
+    border-radius: 14px;
+    box-shadow: 0 6px 18px rgba(0,0,0,0.2);
+    position: relative;
+    z-index: 1; /* float above any gutter artifacts */
+    overflow: hidden; /* hard-clip interior shadows to the rounded container */
+}
+}
+/* Accounts card container tweaks */
+.accounts-card {
+    border-radius: 14px;
+}
+.accounts-card .card-body {
+    padding: 1rem 1rem; /* tighter sides */
+}
+
+.total-balance-amount {
+    font-size: 1.5rem;
+    font-weight: 700;
+    color: #e57d68;
 }
 
 .account-card .card-body {
@@ -285,71 +319,34 @@ label {
     box-shadow: 0 1px 2px rgba(16,24,40,0.2);
 }
 
+/* Transfer avatar accent */
+.txn-avatar-transfer .txn-initials,
+.txn-avatar-transfer .txn-logo {
+    background: linear-gradient(135deg, #e9fdf5, #d4f7ec);
+    border: 1px solid #b7efda;
+}
+
+/* Larger emoji for transfer avatar */
+.txn-avatar-transfer .txn-initials {
+    font-size: 22px;
+    line-height: 36px; /* vertically centers the emoji within the 36px circle */
+}
+
+
 /* Light contrast variant for transaction list card */
 .txn-contrast {
     background-color: #2b2b39; /* slightly lighter than page */
+    position: relative;
+    z-index: 1; /* ensure card sits above column background */
+    border-radius: 14px;
+    overflow: hidden; /* clip header/body shadows to container */
 }
 
 .txn-contrast .card-header {
     background-color: #2a2a36;
 }
 
-.txn-contrast-light .card-body,
-.txn-contrast-light .card-header {
-    background-color: #ffffff;
-    color: #1d1d26;
-}
-
-.txn-contrast-light.card {
-    background-color: #ffffff;
-    border-color: #e4e7ec;
-    box-shadow: 0 2px 8px rgba(16, 24, 40, 0.06);
-}
-
-.txn-contrast-light .txn-row {
-    background-color: #ffffff;
-    border-color: #eef0f3;
-    border-radius: 12px;
-    box-shadow: 0 1px 2px rgba(16, 24, 40, 0.04);
-}
-
-.txn-contrast-light .txn-row:hover {
-    background-color: #fafcff;
-    box-shadow: 0 2px 6px rgba(16, 24, 40, 0.06);
-}
-
-.txn-contrast-light .txn-description {
-    color: #1d1d26;
-}
-
-.txn-contrast-light .txn-merchant {
-    color: #6b7280;
-}
-
-.txn-contrast-light .text-muted {
-    color: #6b7280 !important;
-}
-
-.txn-contrast-light .txn-tags .badge {
-    background-color: #f2f4f7;
-    border-color: #e4e7ec;
-    color: #475467;
-    font-weight: 500;
-}
-
-.txn-contrast-light .txn-date-divider {
-    color: #6b7280;
-}
-
-.txn-contrast-light .txn-date-divider::before,
-.txn-contrast-light .txn-date-divider::after {
-    background: #e7eaee;
-}
-
-/* Thin separators between rows in light mode */
-.txn-contrast-light .txn-row + .txn-row {
-    border-top: 1px solid #eef0f3;
-}
+/* removed light rows variant */
 
 .txn-contrast .card-body {
     background-color: #2b2b39;

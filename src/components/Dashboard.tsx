@@ -1,8 +1,9 @@
-import React from 'react';
+import React, { useState } from 'react';
 import { AppState } from '../App';
 import AccountSummary from './AccountSummary';
 import TransactionList from './TransactionList';
 import SpendingStats from './SpendingStats';
+import Settings from './Settings';
 
 interface DashboardProps {
   state: AppState;
@@ -12,6 +13,7 @@ interface DashboardProps {
 
 const Dashboard: React.FC<DashboardProps> = ({ state, onLogout, onRefresh }) => {
   const { userData, accounts, transactions, loading, error } = state;
+  const [showSettings, setShowSettings] = useState(false);
 
   return (
     <div>
@@ -28,6 +30,12 @@ const Dashboard: React.FC<DashboardProps> = ({ state, onLogout, onRefresh }) => 
               disabled={loading}
             >
               {loading ? '⏳ Refreshing...' : '🔄 Refresh Data'}
+            </button>
+            <button 
+              className="btn btn-outline-secondary"
+              onClick={() => setShowSettings(true)}
+            >
+              Settings
             </button>
             <button 
               className="btn btn-outline-danger"
@@ -59,16 +67,23 @@ const Dashboard: React.FC<DashboardProps> = ({ state, onLogout, onRefresh }) => 
       {/* Main Content */}
       {!loading && (
         <>
-          {/* Account Summary */}
-          <SpendingStats transactions={transactions} />
+          {showSettings ? (
+            <Settings onClose={() => setShowSettings(false)} />
+          ) : (
+            <SpendingStats transactions={transactions} />
+          )}
 
           {/* Two-column layout: accounts (narrow) | transactions (wide) */}
-          <div className="row">
-            <div className="col-md-4 col-lg-3 mb-4">
-              <AccountSummary accounts={accounts} />
+          <div className="row g-3" style={{position: 'relative', zIndex: 0}}>
+            <div className="col-md-4 col-lg-3 mb-4 position-relative" style={{zIndex: 1}}>
+              <div className="column-clip">
+                <AccountSummary accounts={accounts} />
+              </div>
             </div>
-            <div className="col-md-8 col-lg-9">
-              <TransactionList transactions={transactions} />
+            <div className="col-md-8 col-lg-9 position-relative" style={{zIndex: 1}}>
+              <div className="column-clip">
+                {!showSettings && <TransactionList transactions={transactions} />}
+              </div>
             </div>
           </div>
         </>
