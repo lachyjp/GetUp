@@ -98,6 +98,15 @@ const LoginForm: React.FC<LoginFormProps> = ({ onLogin }) => {
     setFormData(prev => ({ ...prev, apiKey: '' }));
   };
 
+  const handleDemoLogin = (e: React.MouseEvent<HTMLButtonElement>) => {
+    e.preventDefault();
+    onLogin({
+      apiKey: DEMO_KEY,
+      userName: formData.userName.trim(),
+      transactionCount: 50,
+    });
+  };
+
   // Function to handle input changes
   const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const { name, value } = e.target;
@@ -196,6 +205,13 @@ const LoginForm: React.FC<LoginFormProps> = ({ onLogin }) => {
                     Try Demo Mode
                   </button>
                   <div className="form-text">Loads example accounts and transactions locally without contacting Up API.</div>
+                </div>
+              )}
+              {!hasSavedKey && (
+                <div className="mb-3">
+                  <button type="button" className="btn btn-secondary" onClick={handleDemoLogin}>
+                    Start Demo (skip API key)
+                  </button>
                 </div>
               )}
 
