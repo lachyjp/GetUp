@@ -18,7 +18,7 @@ const Dashboard: React.FC<DashboardProps> = ({ state, onLogout, onRefresh }) => 
       {/* Welcome Header */}
       <div className="row mb-4">
         <div className="col">
-          <h2>Welcome, {userData?.userName}! 👋</h2>
+          <h2>Welcome, ${userData?.userName}! 👋</h2>
         </div>
         <div className="col-auto">
           <div className="btn-group">
