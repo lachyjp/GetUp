@@ -199,19 +199,13 @@ const LoginForm: React.FC<LoginFormProps> = ({ onLogin }) => {
                 </div>
               )}
 
+              {/* Demo: single button placed above Log In */}
               {!hasSavedKey && (
                 <div className="mb-3">
-                  <button type="button" className="btn btn-outline-secondary" onClick={() => setFormData(prev => ({ ...prev, apiKey: DEMO_KEY }))}>
+                  <button type="button" className="btn btn-outline-secondary" onClick={handleDemoLogin}>
                     Try Demo Mode
                   </button>
                   <div className="form-text">Loads example accounts and transactions locally without contacting Up API.</div>
-                </div>
-              )}
-              {!hasSavedKey && (
-                <div className="mb-3">
-                  <button type="button" className="btn btn-secondary" onClick={handleDemoLogin}>
-                    Start Demo (skip API key)
-                  </button>
                 </div>
               )}
 
