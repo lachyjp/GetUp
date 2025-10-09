@@ -1,5 +1,6 @@
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import { UserData } from '../App';
+import { encryptAndStore, hasStored, tryDecrypt, clearStored } from '../services/secureStorage';
 
 interface LoginFormProps {
   onLogin: (userData: UserData) => void;
@@ -9,11 +10,18 @@ const LoginForm: React.FC<LoginFormProps> = ({ onLogin }) => {
   // Form state - React manages this for us!
   const [formData, setFormData] = useState({
     apiKey: '',
-    userName: '',
-    transactionCount: 20
+    userName: ''
   });
   
   const [errors, setErrors] = useState<{[key: string]: string}>({});
+  const [rememberMe, setRememberMe] = useState<boolean>(false);
+  const [pin, setPin] = useState<string>('');
+  const [hasSavedKey, setHasSavedKey] = useState<boolean>(false);
+  const STORAGE_KEY = 'up-api-key';
+
+  useEffect(() => {
+    setHasSavedKey(hasStored(STORAGE_KEY));
+  }, []);
 
   // Function to validate API key format
   const validateApiKey = (apiKey: string): boolean => {
@@ -35,26 +43,55 @@ const LoginForm: React.FC<LoginFormProps> = ({ onLogin }) => {
       newErrors.userName = 'Please enter your name to personalize your experience';
     }
 
-    const txnCount = parseInt(formData.transactionCount.toString());
-    if (isNaN(txnCount) || txnCount < 1 || txnCount > 100) {
-      newErrors.transactionCount = 'Transaction count must be a number between 1 and 100';
-    }
-
     setErrors(newErrors);
     return Object.keys(newErrors).length === 0;
   };
 
   // Function to handle form submission
-  const handleSubmit = (e: React.FormEvent) => {
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     
-    if (validateForm()) {
-      onLogin({
-        apiKey: formData.apiKey.trim(),
-        userName: formData.userName.trim(),
-        transactionCount: parseInt(formData.transactionCount.toString())
-      });
+    if (!validateForm()) return;
+
+    const apiKey = formData.apiKey.trim();
+
+    if (rememberMe) {
+      if (!pin || pin.length < 4) {
+        setErrors(prev => ({ ...prev, pin: 'Enter a 4+ digit PIN to encrypt your key' }));
+        return;
+      }
+      await encryptAndStore(STORAGE_KEY, apiKey, pin);
+      setHasSavedKey(true);
     }
+
+    onLogin({
+      apiKey,
+      userName: formData.userName.trim(),
+      transactionCount: 50
+    });
+  };
+
+  const handleUnlock = async (e: React.FormEvent) => {
+    e.preventDefault();
+    if (!pin || pin.length < 4) {
+      setErrors(prev => ({ ...prev, pin: 'Enter your PIN (4+ digits)' }));
+      return;
+    }
+    const decrypted = await tryDecrypt(STORAGE_KEY, pin);
+    if (!decrypted) {
+      setErrors(prev => ({ ...prev, pin: 'Incorrect PIN' }));
+      return;
+    }
+    onLogin({
+      apiKey: decrypted,
+      userName: formData.userName.trim(),
+      transactionCount: 50
+    });
+  };
+
+  const handleClearSaved = () => {
+    clearStored(STORAGE_KEY);
+    setHasSavedKey(false);
   };
 
   // Function to handle input changes
@@ -83,9 +120,14 @@ const LoginForm: React.FC<LoginFormProps> = ({ onLogin }) => {
             <p className="text-muted mb-0">Enter your Up Bank API details to get started</p>
           </div>
           <div className="card-body">
-            <form onSubmit={handleSubmit}>
+            {hasSavedKey && (
+              <div className="alert alert-info" role="alert">
+                A saved API key is available on this device. Unlock with your PIN or enter a new key below.
+              </div>
+            )}
+            <form onSubmit={hasSavedKey ? handleUnlock : handleSubmit}>
               <div className="mb-3">
-                <label htmlFor="userName" className="form-label">Your Name</label>
+                <label htmlFor="userName" className="form-label">Your $upID</label>
                 <input
                   type="text"
                   className={`form-control ${errors.userName ? 'is-invalid' : ''}`}
@@ -93,7 +135,7 @@ const LoginForm: React.FC<LoginFormProps> = ({ onLogin }) => {
                   name="userName"
                   value={formData.userName}
                   onChange={handleInputChange}
-                  placeholder="Enter your name"
+                  placeholder="(Optional)"
                   required
                 />
                 {errors.userName && (
@@ -102,7 +144,7 @@ const LoginForm: React.FC<LoginFormProps> = ({ onLogin }) => {
               </div>
 
               <div className="mb-3">
-                <label htmlFor="apiKey" className="form-label">Up API Key</label>
+                <label htmlFor="apiKey" className="form-label">Your up API key</label>
                 <input
                   type="password"
                   className={`form-control ${errors.apiKey ? 'is-invalid' : ''}`}
@@ -110,44 +152,64 @@ const LoginForm: React.FC<LoginFormProps> = ({ onLogin }) => {
                   name="apiKey"
                   value={formData.apiKey}
                   onChange={handleInputChange}
-                  placeholder="Enter your Up API key"
-                  required
+                  placeholder="up:yeah:..."
+                  required={!hasSavedKey}
                 />
                 {errors.apiKey && (
                   <div className="invalid-feedback">{errors.apiKey}</div>
                 )}
                 <div className="form-text">
-                  Get your API key from the Up mobile app
+                  Get your API key from <a href="https://api.up.com.au/getting_started" target="_blank" rel="noopener noreferrer">this link (opens in new tab)</a>
                 </div>
               </div>
 
               <div className="mb-3">
-                <label htmlFor="transactionCount" className="form-label">
-                  Number of Transactions (1-100)
-                </label>
-                <input
-                  type="number"
-                  className={`form-control ${errors.transactionCount ? 'is-invalid' : ''}`}
-                  id="transactionCount"
-                  name="transactionCount"
-                  value={formData.transactionCount}
-                  onChange={handleInputChange}
-                  min="1"
-                  max="100"
-                  placeholder="20"
-                />
-                {errors.transactionCount && (
-                  <div className="invalid-feedback">{errors.transactionCount}</div>
-                )}
-                <div className="form-text">
-                  Choose how many recent transactions to display
+                <div className="form-check form-switch">
+                  <input
+                    className="form-check-input"
+                    type="checkbox"
+                    id="rememberMe"
+                    checked={rememberMe}
+                    onChange={(e) => setRememberMe(e.target.checked)}
+                    disabled={hasSavedKey}
+                  />
+                  <label className="form-check-label" htmlFor="rememberMe">
+                    Remember this API key on this device (encrypted with a PIN)
+                  </label>
                 </div>
               </div>
 
-              <div className="d-grid">
+              {(rememberMe || hasSavedKey) && (
+                <div className="mb-3">
+                  <label htmlFor="pin" className="form-label">PIN (4+ digits)</label>
+                  <input
+                    type="password"
+                    inputMode="numeric"
+                    pattern="[0-9]*"
+                    className={`form-control ${errors.pin ? 'is-invalid' : ''}`}
+                    id="pin"
+                    name="pin"
+                    value={pin}
+                    onChange={(e) => setPin(e.target.value)}
+                    placeholder="Enter PIN to encrypt or unlock"
+                  />
+                  {errors.pin && (
+                    <div className="invalid-feedback">{errors.pin}</div>
+                  )}
+                </div>
+              )}
+
+              {/* Transaction count field removed; default set to 50 */}
+
+              <div className="d-grid gap-2">
                 <button type="submit" className="btn btn-primary btn-lg">
-                  Log In
+                  {hasSavedKey ? 'Unlock and Log In' : 'Log In'}
                 </button>
+                {hasSavedKey && (
+                  <button type="button" className="btn btn-outline-danger" onClick={handleClearSaved}>
+                    Forget saved API key on this device
+                  </button>
+                )}
               </div>
             </form>
           </div>
