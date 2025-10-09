@@ -150,10 +150,14 @@ const LoginForm: React.FC<LoginFormProps> = ({ onLogin }) => {
                 <div className="mb-3">
                   <label htmlFor="apiKey" className="form-label">Your up API key</label>
                   <input
-                    type="password"
+                    type="text"
                     className={`form-control ${errors.apiKey ? 'is-invalid' : ''}`}
                     id="apiKey"
                     name="apiKey"
+                    autoComplete="off"
+                    autoCorrect="off"
+                    autoCapitalize="off"
+                    spellCheck={false}
                     value={formData.apiKey}
                     onChange={handleInputChange}
                     placeholder="up:yeah:..."
