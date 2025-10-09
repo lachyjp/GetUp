@@ -1,7 +1,7 @@
 {
   "files": {
     "main.css": "/GetUp/static/css/main.5dffc45b.css",
-    "main.js": "/GetUp/static/js/main.c844594b.js",
+    "main.js": "/GetUp/static/js/main.dc05ec3e.js",
     "static/js/453.3a5cbd5d.chunk.js": "/GetUp/static/js/453.3a5cbd5d.chunk.js",
     "static/media/CircularStd-Light.otf": "/GetUp/static/media/CircularStd-Light.4a1a0bfcc3a53847a945.otf",
     "static/media/CircularStd-BlackItalic.otf": "/GetUp/static/media/CircularStd-BlackItalic.e1f3943738ef431efb3e.otf",
@@ -11,11 +11,11 @@
     "static/media/CircularStd-Book.otf": "/GetUp/static/media/CircularStd-Book.9048137056e4347dbbd5.otf",
     "index.html": "/GetUp/index.html",
     "main.5dffc45b.css.map": "/GetUp/static/css/main.5dffc45b.css.map",
-    "main.c844594b.js.map": "/GetUp/static/js/main.c844594b.js.map",
+    "main.dc05ec3e.js.map": "/GetUp/static/js/main.dc05ec3e.js.map",
     "453.3a5cbd5d.chunk.js.map": "/GetUp/static/js/453.3a5cbd5d.chunk.js.map"
   },
   "entrypoints": [
     "static/css/main.5dffc45b.css",
-    "static/js/main.c844594b.js"
+    "static/js/main.dc05ec3e.js"
   ]
 }
