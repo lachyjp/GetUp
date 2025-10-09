@@ -1,6 +1,7 @@
 import { useState, useCallback } from 'react';
 import { Account, Transaction, UserData } from '../App';
 import upBankApi from '../services/apiService';
+import { demoAccounts, demoTransactions } from '../data/demoData';
 
 // Hook for managing Up Bank data
 export const useUpBankData = () => {
@@ -15,6 +16,13 @@ export const useUpBankData = () => {
     setError(null);
 
     try {
+      if (userData.apiKey === '__DEMO__') {
+        // Demo mode: populate from bundled data
+        setAccounts(demoAccounts);
+        setTransactions(demoTransactions);
+        return;
+      }
+
       // Set API key
       upBankApi.setApiKey(userData.apiKey);
 
@@ -51,6 +59,12 @@ export const useUpBankData = () => {
     setError(null);
 
     try {
+      if (userData.apiKey === '__DEMO__') {
+        setAccounts(demoAccounts);
+        setTransactions(demoTransactions);
+        return;
+      }
+
       // Clear cache to force refresh
       upBankApi.clearCache();
       

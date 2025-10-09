@@ -18,6 +18,7 @@ const LoginForm: React.FC<LoginFormProps> = ({ onLogin }) => {
   const [pin, setPin] = useState<string>('');
   const [hasSavedKey, setHasSavedKey] = useState<boolean>(false);
   const STORAGE_KEY = 'up-api-key';
+  const DEMO_KEY = '__DEMO__';
 
   useEffect(() => {
     setHasSavedKey(hasStored(STORAGE_KEY));
@@ -186,6 +187,15 @@ const LoginForm: React.FC<LoginFormProps> = ({ onLogin }) => {
                       Remember this API key on this device (encrypted with a PIN)
                     </label>
                   </div>
+                </div>
+              )}
+
+              {!hasSavedKey && (
+                <div className="mb-3">
+                  <button type="button" className="btn btn-outline-secondary" onClick={() => setFormData(prev => ({ ...prev, apiKey: DEMO_KEY }))}>
+                    Try Demo Mode
+                  </button>
+                  <div className="form-text">Loads example accounts and transactions locally without contacting Up API.</div>
                 </div>
               )}
 
