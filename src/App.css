@@ -78,15 +78,20 @@ label {
     background-color: #343444;
     border: 1px solid #2d2d3b;
     color: #fbfbfa;
+    border-radius: 12px;
+    margin-bottom: 1.25rem; /* extra space between cards */
+    box-shadow: 0 6px 18px rgba(0,0,0,0.2);
 }
 
 .card-header {
     background-color: #2d2d3b;
     border-bottom: 1px solid #2d2d3b;
+    padding: 1rem 1.25rem; /* increase header padding */
 }
 
 .card-body {
     background-color: #343444;
+    padding: 1.25rem; /* increase body padding */
 }
 
 /* Button Styles */
@@ -154,6 +159,8 @@ label {
 .accordion-item {
     background-color: #343444;
     border: 1px solid #2d2d3b;
+    border-radius: 10px;
+    margin-bottom: 0.5rem; /* spacing between accordion items */
 }
 
 .accordion-button {
@@ -176,6 +183,7 @@ label {
     background-color: #2d2d3b;
     color: #fbfbfa;
     font-family: 'Circular-Book', sans-serif;
+    padding: 1rem 1.25rem;
 }
 
 /* Badge Styles */
