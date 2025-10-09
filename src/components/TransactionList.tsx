@@ -6,7 +6,7 @@ interface TransactionListProps {
 }
 
 const TransactionList: React.FC<TransactionListProps> = ({ transactions }) => {
-  const [expandedTransactions, setExpandedTransactions] = useState<Set<number>>(new Set());
+  const [expandedTransactions, setExpandedTransactions] = useState<Set<string>>(new Set());
 
   // Group transactions by date
   const groupTransactionsByDate = () => {
@@ -32,13 +32,13 @@ const TransactionList: React.FC<TransactionListProps> = ({ transactions }) => {
   };
 
   // Toggle transaction expansion
-  const toggleTransaction = (index: number) => {
+  const toggleTransaction = (key: string) => {
     setExpandedTransactions(prev => {
       const newSet = new Set(prev);
-      if (newSet.has(index)) {
-        newSet.delete(index);
+      if (newSet.has(key)) {
+        newSet.delete(key);
       } else {
-        newSet.add(index);
+        newSet.add(key);
       }
       return newSet;
     });
@@ -59,15 +59,17 @@ const TransactionList: React.FC<TransactionListProps> = ({ transactions }) => {
             <div key={date} className="mb-4">
               <h5 className="text-primary mb-3">{formatDate(date)}</h5>
               
-              {dayTransactions.map((transaction, index) => (
+              {dayTransactions.map((transaction, index) => {
+                const itemKey = (transaction.id ? `${date}-${transaction.id}` : `${date}-${index}`);
+                return (
                 <div key={transaction.id || index} className="accordion mb-2">
                   <div className="accordion-item">
                     <h2 className="accordion-header">
                       <button
-                        className={`accordion-button ${!expandedTransactions.has(index) ? 'collapsed' : ''}`}
+                        className={`accordion-button ${!expandedTransactions.has(itemKey) ? 'collapsed' : ''}`}
                         type="button"
-                        onClick={() => toggleTransaction(index)}
-                        aria-expanded={expandedTransactions.has(index)}
+                        onClick={() => toggleTransaction(itemKey)}
+                        aria-expanded={expandedTransactions.has(itemKey)}
                       >
                         <div className="d-flex justify-content-between w-100 me-3">
                           <span>{transaction.description}</span>
@@ -78,7 +80,7 @@ const TransactionList: React.FC<TransactionListProps> = ({ transactions }) => {
                       </button>
                     </h2>
                     
-                    {expandedTransactions.has(index) && (
+                    {expandedTransactions.has(itemKey) && (
                       <div className="accordion-collapse collapse show">
                         <div className="accordion-body">
                           <div className="row">
@@ -103,7 +105,7 @@ const TransactionList: React.FC<TransactionListProps> = ({ transactions }) => {
                     )}
                   </div>
                 </div>
-              ))}
+              );})}
             </div>
           ))
         )}
