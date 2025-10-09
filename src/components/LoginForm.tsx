@@ -92,6 +92,9 @@ const LoginForm: React.FC<LoginFormProps> = ({ onLogin }) => {
   const handleClearSaved = () => {
     clearStored(STORAGE_KEY);
     setHasSavedKey(false);
+    setRememberMe(false);
+    setPin('');
+    setFormData(prev => ({ ...prev, apiKey: '' }));
   };
 
   // Function to handle input changes
@@ -143,25 +146,27 @@ const LoginForm: React.FC<LoginFormProps> = ({ onLogin }) => {
                 )}
               </div>
 
-              <div className="mb-3">
-                <label htmlFor="apiKey" className="form-label">Your up API key</label>
-                <input
-                  type="password"
-                  className={`form-control ${errors.apiKey ? 'is-invalid' : ''}`}
-                  id="apiKey"
-                  name="apiKey"
-                  value={formData.apiKey}
-                  onChange={handleInputChange}
-                  placeholder="up:yeah:..."
-                  required={!hasSavedKey}
-                />
-                {errors.apiKey && (
-                  <div className="invalid-feedback">{errors.apiKey}</div>
-                )}
-                <div className="form-text">
-                  Get your API key from <a href="https://api.up.com.au/getting_started" target="_blank" rel="noopener noreferrer">this link (opens in new tab)</a>
+              {!hasSavedKey && (
+                <div className="mb-3">
+                  <label htmlFor="apiKey" className="form-label">Your up API key</label>
+                  <input
+                    type="password"
+                    className={`form-control ${errors.apiKey ? 'is-invalid' : ''}`}
+                    id="apiKey"
+                    name="apiKey"
+                    value={formData.apiKey}
+                    onChange={handleInputChange}
+                    placeholder="up:yeah:..."
+                    required
+                  />
+                  {errors.apiKey && (
+                    <div className="invalid-feedback">{errors.apiKey}</div>
+                  )}
+                  <div className="form-text">
+                    Get your API key from <a href="https://api.up.com.au/getting_started" target="_blank" rel="noopener noreferrer">this link (opens in new tab)</a>
+                  </div>
                 </div>
-              </div>
+              )}
 
               <div className="mb-3">
                 <div className="form-check form-switch">
