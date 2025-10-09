@@ -209,6 +209,178 @@ label {
     color: #e57d68;
 }
 
+/* Transaction list (inline) */
+.txn-row {
+    padding: 0.75rem 1rem;
+    background-color: #2d2d3b;
+    border: 1px solid #3a3a4a;
+    border-radius: 10px;
+    margin-bottom: 0.5rem;
+}
+
+.account-card {
+    background-color: #343444;
+    border: 1px solid #2d2d3b;
+    border-radius: 12px;
+}
+
+.account-card .card-body {
+    padding: 0.75rem 1rem; /* compact */
+}
+
+.account-card .card-title {
+    margin-bottom: 0.25rem; /* compact */
+}
+
+.account-card .card-text {
+    margin-bottom: 0.25rem; /* compact */
+}
+
+.txn-row:hover {
+    background-color: #303041;
+}
+
+.txn-description {
+    color: #fbfbfa;
+    font-family: 'Circular-Bold', sans-serif;
+}
+
+.txn-merchant {
+    color: #9aa0a6;
+}
+
+.txn-amount {
+    font-family: 'Circular-Medium', sans-serif;
+}
+
+.txn-tags .badge {
+    background-color: #4a4a5a;
+    border: 1px solid #5a5a6a;
+}
+
+.txn-logo {
+    border-radius: 50%;
+    background-color: #ffffff;
+    box-shadow: 0 1px 2px rgba(16,24,40,0.2);
+    object-fit: cover;
+}
+
+.txn-avatar {
+    width: 36px;
+    height: 36px;
+}
+
+.txn-initials {
+    width: 36px;
+    height: 36px;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-family: 'Circular-Bold', sans-serif;
+    font-size: 12px;
+    color: #1d1d26;
+    background: linear-gradient(135deg, #e6f0ff, #f4f8ff);
+    border: 1px solid #e2e8f0;
+    box-shadow: 0 1px 2px rgba(16,24,40,0.2);
+}
+
+/* Light contrast variant for transaction list card */
+.txn-contrast {
+    background-color: #2b2b39; /* slightly lighter than page */
+}
+
+.txn-contrast .card-header {
+    background-color: #2a2a36;
+}
+
+.txn-contrast-light .card-body,
+.txn-contrast-light .card-header {
+    background-color: #ffffff;
+    color: #1d1d26;
+}
+
+.txn-contrast-light.card {
+    background-color: #ffffff;
+    border-color: #e4e7ec;
+    box-shadow: 0 2px 8px rgba(16, 24, 40, 0.06);
+}
+
+.txn-contrast-light .txn-row {
+    background-color: #ffffff;
+    border-color: #eef0f3;
+    border-radius: 12px;
+    box-shadow: 0 1px 2px rgba(16, 24, 40, 0.04);
+}
+
+.txn-contrast-light .txn-row:hover {
+    background-color: #fafcff;
+    box-shadow: 0 2px 6px rgba(16, 24, 40, 0.06);
+}
+
+.txn-contrast-light .txn-description {
+    color: #1d1d26;
+}
+
+.txn-contrast-light .txn-merchant {
+    color: #6b7280;
+}
+
+.txn-contrast-light .text-muted {
+    color: #6b7280 !important;
+}
+
+.txn-contrast-light .txn-tags .badge {
+    background-color: #f2f4f7;
+    border-color: #e4e7ec;
+    color: #475467;
+    font-weight: 500;
+}
+
+.txn-contrast-light .txn-date-divider {
+    color: #6b7280;
+}
+
+.txn-contrast-light .txn-date-divider::before,
+.txn-contrast-light .txn-date-divider::after {
+    background: #e7eaee;
+}
+
+/* Thin separators between rows in light mode */
+.txn-contrast-light .txn-row + .txn-row {
+    border-top: 1px solid #eef0f3;
+}
+
+.txn-contrast .card-body {
+    background-color: #2b2b39;
+}
+
+.txn-contrast .txn-row {
+    background-color: #353548;
+    border-color: #45455a;
+}
+
+.txn-contrast .txn-row:hover {
+    background-color: #3a3a4e;
+}
+
+.txn-date-divider {
+    display: flex;
+    align-items: center;
+    gap: 0.75rem;
+    color: #9aa0a6;
+    font-family: 'Circular-Medium', sans-serif;
+    margin: 1rem 0 0.75rem 0;
+}
+
+.txn-date-divider::before,
+.txn-date-divider::after {
+    content: '';
+    height: 1px;
+    background: #44445a;
+    flex: 1;
+}
+
 /* Text Colors */
 .text-primary {
     color: #e57d68 !important;

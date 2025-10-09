@@ -23,21 +23,19 @@ const AccountSummary: React.FC<AccountSummaryProps> = ({ accounts }) => {
         
         <hr />
         
-        <div className="row">
+        <div className="d-flex flex-column gap-2">
           {accounts.map((account, index) => (
-            <div key={account.id || index} className="col-md-6 mb-3">
-              <div className="card">
-                <div className="card-body">
-                  <h5 className="card-title">
-                    {account.name === "Spending" ? "💸" : ""} {account.name}
-                  </h5>
-                  <p className="card-text">
-                    <strong>Balance:</strong> ${account.balance.toFixed(2)}
-                  </p>
-                  <small className="text-muted">
-                    {account.type} • {account.owner}
-                  </small>
-                </div>
+            <div key={account.id || index} className="card account-card w-100">
+              <div className="card-body">
+                <h5 className="card-title">
+                  {account.name === "Spending" ? "💸" : ""} {account.name}
+                </h5>
+                <p className="card-text">
+                  <strong>Balance:</strong> ${account.balance.toFixed(2)}
+                </p>
+                <small className="text-muted">
+                  {account.type} • {account.owner}
+                </small>
               </div>
             </div>
           ))}

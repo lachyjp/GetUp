@@ -31,6 +31,8 @@ export interface Transaction {
   text: string;
   message: string;
   roundup: string;
+  tags?: string[];
+  merchantLogoUrl?: string;
 }
 
 export interface AppState {

@@ -199,16 +199,6 @@ const LoginForm: React.FC<LoginFormProps> = ({ onLogin }) => {
                 </div>
               )}
 
-              {/* Demo: single button placed above Log In */}
-              {!hasSavedKey && (
-                <div className="mb-3">
-                  <button type="button" className="btn btn-outline-secondary" onClick={handleDemoLogin}>
-                    Try Demo Mode
-                  </button>
-                  <div className="form-text">Loads example accounts and transactions locally without contacting Up API.</div>
-                </div>
-              )}
-
               {(rememberMe || hasSavedKey) && (
                 <div className="mb-3">
                   <label htmlFor="pin" className="form-label">PIN (4+ digits)</label>
@@ -231,7 +221,15 @@ const LoginForm: React.FC<LoginFormProps> = ({ onLogin }) => {
 
               {/* Transaction count field removed; default set to 50 */}
 
+              {/* Demo: single button placed above Log In */}
+              
+
               <div className="d-grid gap-2">
+              {!hasSavedKey && (
+                <button type="button" className="btn btn-outline-secondary" onClick={handleDemoLogin}>
+                  Try Demo Mode
+                </button>
+              )}
                 <button type="submit" className="btn btn-primary btn-lg">
                   {hasSavedKey ? 'Unlock and Log In' : 'Log In'}
                 </button>

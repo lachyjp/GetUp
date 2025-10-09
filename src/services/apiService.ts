@@ -1,5 +1,6 @@
 import axios, { AxiosResponse } from 'axios';
 import { Account, Transaction } from '../App';
+import { resolveMerchantLogo } from './merchantLogos';
 
 // API Configuration
 const API_CONFIG = {
@@ -167,7 +168,7 @@ class UpBankApiService {
       }
 
       const response = await this.retryRequest(
-        () => axios.get(`${API_CONFIG.baseURL}/transactions?page[size]=${transactionCount}`, {
+        () => axios.get(`${API_CONFIG.baseURL}/transactions?page[size]=${transactionCount}&include=merchant`, {
           headers: { Authorization: `Bearer ${this.apiKey}` },
           timeout: API_CONFIG.timeout,
         }),
@@ -176,6 +177,18 @@ class UpBankApiService {
 
       if (!this.validateApiResponse(response.data, 'transactions')) {
         return { success: false, error: 'Invalid response format from Up API' };
+      }
+
+      // Build merchant lookup from included
+      const included = response.data.included || [];
+      const merchantById: Record<string, { name?: string; websiteUrl?: string }> = {};
+      for (const inc of included) {
+        if (inc.type === 'merchants') {
+          merchantById[inc.id] = {
+            name: inc.attributes?.name,
+            websiteUrl: inc.attributes?.websiteUrl,
+          };
+        }
       }
 
       // Process transactions data
@@ -189,17 +202,35 @@ class UpBankApiService {
           const [date, time] = item.attributes.createdAt.split('T');
           const formattedTime = this.formatTime(time);
           
+          const description: string = item.attributes.description;
+          const rawText: string = item.attributes.rawText || 'N/A';
+          const merchantId: string | undefined = item.relationships?.merchant?.data?.id;
+          const merchantInfo = merchantId ? merchantById[merchantId] : undefined;
+
+          let merchantLogoUrl: string | undefined;
+          if (merchantInfo?.websiteUrl) {
+            const domain = this.extractDomain(merchantInfo.websiteUrl);
+            if (domain) merchantLogoUrl = `https://logo.clearbit.com/${domain}`;
+          }
+          if (!merchantLogoUrl) {
+            merchantLogoUrl = resolveMerchantLogo(description, rawText);
+          }
+
           return {
             id: item.id,
-            description: item.attributes.description,
+            description,
             amount: Math.abs(amount),
             type: isPositive ? '+' : '',
             status: item.attributes.status,
             date: date,
             time: formattedTime,
-            text: item.attributes.rawText || 'N/A',
+            text: rawText,
             message: item.attributes.message || 'N/A',
             roundup: item.attributes.roundUp ? 'true' : 'false',
+            tags: Array.isArray(item.relationships?.tags?.data)
+              ? item.relationships.tags.data.map((t: any) => t.id?.replace('tag-', '')).filter(Boolean)
+              : [],
+            merchantLogoUrl,
           };
         });
 
@@ -240,6 +271,17 @@ class UpBankApiService {
   // Clear cache
   clearCache() {
     cache.clear();
+  }
+
+  // Resolution moved to merchantLogos.ts
+
+  private extractDomain(url: string): string | null {
+    try {
+      const u = new URL(url.startsWith('http') ? url : `https://${url}`);
+      return u.hostname;
+    } catch {
+      return null;
+    }
   }
 
   // Fetch all data (accounts + transactions)

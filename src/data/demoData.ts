@@ -17,6 +17,8 @@ export const demoTransactions: Transaction[] = [
     text: 'BLUE BOTTLE COFFEE',
     message: 'Morning pick-me-up',
     roundup: 'false',
+    tags: ['coffee', 'food'],
+    merchantLogoUrl: 'https://logo.clearbit.com/bluebottlecoffee.com'
   },
   {
     id: 'txn_demo_2',
@@ -29,6 +31,8 @@ export const demoTransactions: Transaction[] = [
     text: 'WHOLEFOODS MARKET',
     message: 'Weekly shop',
     roundup: 'true',
+    tags: ['groceries'],
+    merchantLogoUrl: 'https://logo.clearbit.com/wholefoodsmarket.com'
   },
   {
     id: 'txn_demo_3',
@@ -41,6 +45,8 @@ export const demoTransactions: Transaction[] = [
     text: 'ACME CORP PAYROLL',
     message: 'Monthly salary',
     roundup: 'false',
+    tags: ['income'],
+    merchantLogoUrl: 'https://logo.clearbit.com/acme.com'
   },
 ];
 

@@ -60,13 +60,17 @@ const Dashboard: React.FC<DashboardProps> = ({ state, onLogout, onRefresh }) => 
       {!loading && (
         <>
           {/* Account Summary */}
-          <AccountSummary accounts={accounts} />
-
-          {/* Spending Statistics */}
           <SpendingStats transactions={transactions} />
 
-          {/* Transaction List */}
-          <TransactionList transactions={transactions} />
+          {/* Two-column layout: accounts (narrow) | transactions (wide) */}
+          <div className="row">
+            <div className="col-md-4 col-lg-3 mb-4">
+              <AccountSummary accounts={accounts} />
+            </div>
+            <div className="col-md-8 col-lg-9">
+              <TransactionList transactions={transactions} />
+            </div>
+          </div>
         </>
       )}
     </div>
