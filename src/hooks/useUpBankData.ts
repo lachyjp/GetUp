@@ -17,7 +17,8 @@ export const useUpBankData = () => {
 
     try {
       if (userData.apiKey === '__DEMO__') {
-        // Demo mode: populate from bundled data
+        // Demo mode: simulate network latency, then populate from bundled data
+        await new Promise(resolve => setTimeout(resolve, 800));
         setAccounts(demoAccounts);
         setTransactions(demoTransactions);
         return;
@@ -60,6 +61,7 @@ export const useUpBankData = () => {
 
     try {
       if (userData.apiKey === '__DEMO__') {
+        await new Promise(resolve => setTimeout(resolve, 600));
         setAccounts(demoAccounts);
         setTransactions(demoTransactions);
         return;
