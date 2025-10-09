@@ -1,0 +1,5 @@
+﻿# Dependencies
+node_modules/
+
+# Build output (CRA)
+build/
