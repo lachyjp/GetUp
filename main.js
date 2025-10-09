@@ -115,8 +115,10 @@ let currentTxnAmount = null;
 // Refresh data function using modern JS features
 const refreshData = async () => {
     if (currentUpKey && currentTxnAmount) {
-        showError('🔄 Refreshing data...');
+        showNotification('🔄 Refreshing data...', 'info', 2000);
         await loadUserData(currentUpKey, currentTxnAmount, true); // Force refresh
+    } else {
+        showError('❌ No session data found. Please log in again.');
     }
 };
 
