@@ -208,6 +208,13 @@ const AccountMenu: React.FC<{ account: Account }> = ({ account }) => {
     }
   }, [showDropdown]);
 
+  // Only show menu for saver accounts that can set goals
+  const canSetGoal = account.type?.toLowerCase().includes('saver');
+  
+  if (!canSetGoal) {
+    return null;
+  }
+
   return (
     <div className={`dropdown ${showDropdown ? 'show' : ''}`} ref={dropdownRef}>
       <button
@@ -220,12 +227,7 @@ const AccountMenu: React.FC<{ account: Account }> = ({ account }) => {
       </button>
       {showDropdown && (
         <div className="dropdown-menu show">
-          {account.type?.toLowerCase().includes('saver') && (
-            <SaverGoalDropdown accountId={account.id} balance={account.balance} />
-          )}
-          <div className="dropdown-item-text">
-            <small className="text-muted">Account ID: {account.id}</small>
-          </div>
+          <SaverGoalDropdown accountId={account.id} balance={account.balance} />
         </div>
       )}
     </div>

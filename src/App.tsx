@@ -4,6 +4,7 @@ import './App.css';
 import LoginForm from './components/LoginForm';
 import Dashboard from './components/Dashboard';
 import ErrorBoundary from './components/ErrorBoundary';
+import Footer from './components/Footer';
 import { useUpBankData } from './hooks/useUpBankData';
 
 // Types for our app
@@ -95,32 +96,35 @@ function App() {
   };
 
   return (
-    <div className="App">
-      <div className="container">
-        <h1 className="text-center mb-4">GetUp ↑</h1>
-        
-        <ErrorBoundary>
-          {!isLoggedIn ? (
-            <LoginForm onLogin={handleLogin} />
-          ) : (
-            <ErrorBoundary>
-              <Dashboard 
-                state={{
-                  isLoggedIn,
-                  userData,
-                  accounts,
-                  transactions,
-                  loading,
-                  error
-                }}
-                onLogout={handleLogout}
-                onRefresh={handleRefresh}
-              />
-            </ErrorBoundary>
-          )}
-        </ErrorBoundary>
+    <>
+      <div className="App">
+        <div className="container">
+          <h1 className="text-center mb-4">GetUp ↑</h1>
+          
+          <ErrorBoundary>
+            {!isLoggedIn ? (
+              <LoginForm onLogin={handleLogin} />
+            ) : (
+              <ErrorBoundary>
+                <Dashboard 
+                  state={{
+                    isLoggedIn,
+                    userData,
+                    accounts,
+                    transactions,
+                    loading,
+                    error
+                  }}
+                  onLogout={handleLogout}
+                  onRefresh={handleRefresh}
+                />
+              </ErrorBoundary>
+            )}
+          </ErrorBoundary>
+        </div>
       </div>
-    </div>
+      <Footer />
+    </>
   );
 }
 
