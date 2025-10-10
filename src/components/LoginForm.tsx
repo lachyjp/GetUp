@@ -23,7 +23,7 @@ const LoginForm: React.FC<LoginFormProps> = ({ onLogin }) => {
 
   useEffect(() => {
     setHasSavedKey(hasStored(STORAGE_KEY));
-  }, []);
+  }, [STORAGE_KEY]);
 
   // Function to validate API key format
   const validateApiKey = (apiKey: string): boolean => {

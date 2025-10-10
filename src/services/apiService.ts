@@ -42,7 +42,7 @@ class UpBankApiService {
     requestFn: () => Promise<AxiosResponse<T>>,
     context: string
   ): Promise<AxiosResponse<T>> {
-    let lastError: Error;
+    let lastError: Error | undefined;
 
     for (let attempt = 0; attempt < API_CONFIG.retryAttempts; attempt++) {
       try {
@@ -62,7 +62,7 @@ class UpBankApiService {
       }
     }
 
-    throw lastError!;
+    throw lastError || new Error('All retry attempts failed');
   }
 
   // Validate API response structure

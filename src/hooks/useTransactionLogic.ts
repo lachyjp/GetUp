@@ -1,4 +1,4 @@
-import { useState, useCallback } from 'react';
+import { useCallback } from 'react';
 import { Transaction } from '../App';
 
 interface UseTransactionLogicReturn {
@@ -89,26 +89,6 @@ export const useTransactionLogic = (
     return result;
   }, []);
 
-  // Group transactions by date for a specific month
-  const groupTransactionsByDate = useCallback((monthKey: string) => {
-    const filteredTransactions = getFilteredTransactions();
-    const monthTransactions = filteredTransactions.filter(transaction => {
-      const date = new Date(transaction.date);
-      const transactionMonth = `${date.getFullYear()}-${String(date.getMonth() + 1).padStart(2, '0')}`;
-      return transactionMonth === monthKey;
-    });
-
-    const grouped: { [key: string]: Transaction[] } = {};
-    monthTransactions.forEach(transaction => {
-      const date = transaction.date;
-      if (!grouped[date]) {
-        grouped[date] = [];
-      }
-      grouped[date].push(transaction);
-    });
-    
-    return grouped;
-  }, [getFilteredTransactions]);
 
   const filteredTransactions = getFilteredTransactions();
   const availableMonths = getAvailableMonths();

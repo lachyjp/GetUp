@@ -53,7 +53,7 @@ const TransactionList: React.FC<TransactionListProps> = ({ transactions, selecte
     });
     
     return grouped;
-  }, [currentMonth, filteredTransactions]);
+  }, [currentMonth, getTransactionsForMonth]);
 
   const formatMonth = (monthKey: string) => {
     const [year, month] = monthKey.split('-');
