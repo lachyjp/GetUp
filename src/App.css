@@ -401,8 +401,24 @@ label {
 
 /* Mobile Responsiveness */
 @media (max-width: 768px) {
+    body {
+        padding: 0.75rem;
+    }
+    
     .container {
         padding: 10px;
+    }
+    
+    .card-body {
+        padding: 1rem;
+    }
+    
+    .card-header {
+        padding: 0.75rem 1rem;
+    }
+    
+    .txn-row {
+        padding: 0.75rem 0.75rem;
     }
     
     h1 {
@@ -424,8 +440,28 @@ label {
 }
 
 @media (max-width: 480px) {
+    body {
+        padding: 0.5rem;
+    }
+    
     .container {
         padding: 5px;
+    }
+    
+    .card-body {
+        padding: 0.75rem;
+    }
+    
+    .card-header {
+        padding: 0.5rem 0.75rem;
+    }
+    
+    .txn-row {
+        padding: 0.5rem 0.5rem;
+    }
+    
+    .txn-amount {
+        font-size: 0.9rem;
     }
     
     h1 {
