@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import { Transaction } from '../App';
-import { normalize, resolveMerchantLogo, resolveMerchantDomain } from '../services/merchantLogos';
+import { resolveMerchantLogo, resolveMerchantDomain } from '../services/merchantLogos';
 
 interface TransactionListProps {
   transactions: Transaction[];
@@ -31,7 +31,7 @@ const TransactionList: React.FC<TransactionListProps> = ({ transactions }) => {
     return `${date.getDate()} ${months[date.getMonth()]}`;
   };
 
-  const isIncome = (t: Transaction) => t.type === '+' || t.amount < 0 === false && t.type === '+'; // conservative
+  // const isIncome = (t: Transaction) => t.type === '+' || ((t.amount < 0) === false && t.type === '+'); // conservative
 
   const isPresent = (value?: string) => {
     if (!value) return false;
@@ -42,7 +42,7 @@ const TransactionList: React.FC<TransactionListProps> = ({ transactions }) => {
 
   const groupedTransactions = groupTransactionsByDate();
 
-  const [debugLogos, setDebugLogos] = useState<boolean>(() => {
+  const [debugLogos] = useState<boolean>(() => {
     try {
       const saved = localStorage.getItem('txnDebugLogos');
       return saved === '1';

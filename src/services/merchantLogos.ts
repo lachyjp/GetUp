@@ -91,10 +91,6 @@ function toClearbit(domain: string): string {
   return `https://logo.clearbit.com/${domain}?size=256`;
 }
 
-function toGoogleFavicon(domain: string): string {
-  return `https://www.google.com/s2/favicons?domain=${encodeURIComponent(domain)}&sz=64`;
-}
-
 export function resolveMerchantLogo(description?: string, rawText?: string): string | undefined {
   const domain = resolveMerchantDomain(description, rawText);
   if (domain) return toClearbit(domain);
