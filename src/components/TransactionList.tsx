@@ -1,18 +1,60 @@
-import React, { useState } from 'react';
+import React, { useState, useRef, useMemo } from 'react';
 import { Transaction } from '../App';
 import { normalize, resolveMerchantLogo, resolveMerchantDomain } from '../services/merchantLogos';
 
 interface TransactionListProps {
   transactions: Transaction[];
+  selectedAccountId?: string | null;
 }
 
-const TransactionList: React.FC<TransactionListProps> = ({ transactions }) => {
+const TransactionList: React.FC<TransactionListProps> = ({ transactions, selectedAccountId }) => {
+  const [currentMonth, setCurrentMonth] = useState<string>('');
 
-  // Group transactions by date
+  // Filter transactions by selected account
+  const getFilteredTransactions = () => {
+    if (selectedAccountId === null || selectedAccountId === undefined) {
+      return transactions; // Show all transactions
+    }
+    return transactions.filter(transaction => transaction.accountId === selectedAccountId);
+  };
+
+  // Get unique months from transactions
+  const getAvailableMonths = useMemo(() => {
+    const filteredTransactions = getFilteredTransactions();
+    const months = new Set<string>();
+    
+    filteredTransactions.forEach(transaction => {
+      const date = new Date(transaction.date);
+      const monthKey = `${date.getFullYear()}-${String(date.getMonth() + 1).padStart(2, '0')}`;
+      months.add(monthKey);
+    });
+    
+    return Array.from(months).sort().reverse(); // Most recent first
+  }, [transactions, selectedAccountId]);
+
+  // Set initial month to most recent
+  React.useEffect(() => {
+    if (getAvailableMonths.length > 0 && !currentMonth) {
+      setCurrentMonth(getAvailableMonths[0]);
+    }
+  }, [getAvailableMonths, currentMonth]);
+
+  // Filter transactions by selected month
+  const getTransactionsForMonth = (monthKey: string) => {
+    const filteredTransactions = getFilteredTransactions();
+    return filteredTransactions.filter(transaction => {
+      const date = new Date(transaction.date);
+      const transactionMonth = `${date.getFullYear()}-${String(date.getMonth() + 1).padStart(2, '0')}`;
+      return transactionMonth === monthKey;
+    });
+  };
+
+  // Group transactions by date for the selected month
   const groupTransactionsByDate = () => {
+    const monthTransactions = getTransactionsForMonth(currentMonth);
     const grouped: { [key: string]: Transaction[] } = {};
     
-    transactions.forEach(transaction => {
+    monthTransactions.forEach(transaction => {
       const date = transaction.date;
       if (!grouped[date]) {
         grouped[date] = [];
@@ -31,7 +73,36 @@ const TransactionList: React.FC<TransactionListProps> = ({ transactions }) => {
     return `${date.getDate()} ${months[date.getMonth()]}`;
   };
 
-  const isIncome = (t: Transaction) => t.type === '+' || t.amount < 0 === false && t.type === '+'; // conservative
+  // Format month for display
+  const formatMonth = (monthKey: string) => {
+    const [year, month] = monthKey.split('-');
+    const months = ['January', 'February', 'March', 'April', 'May', 'June', 
+                   'July', 'August', 'September', 'October', 'November', 'December'];
+    return `${months[parseInt(month) - 1]} ${year}`;
+  };
+
+  // Get current month index for navigation
+  const getCurrentMonthIndex = () => {
+    return getAvailableMonths.indexOf(currentMonth);
+  };
+
+  // Navigate to previous month
+  const goToPreviousMonth = () => {
+    const currentIndex = getCurrentMonthIndex();
+    if (currentIndex < getAvailableMonths.length - 1) {
+      setCurrentMonth(getAvailableMonths[currentIndex + 1]);
+    }
+  };
+
+  // Navigate to next month
+  const goToNextMonth = () => {
+    const currentIndex = getCurrentMonthIndex();
+    if (currentIndex > 0) {
+      setCurrentMonth(getAvailableMonths[currentIndex - 1]);
+    }
+  };
+
+  const isIncome = (t: Transaction) => t.type === '+' || t.amount < 0;
 
   const isPresent = (value?: string) => {
     if (!value) return false;
@@ -51,9 +122,10 @@ const TransactionList: React.FC<TransactionListProps> = ({ transactions }) => {
     }
   });
 
-  const [failedLogos, setFailedLogos] = useState<Set<string>>(new Set());
-  const [triedIconHorse, setTriedIconHorse] = useState<Set<string>>(new Set());
-  const [triedGoogleFavicon, setTriedGoogleFavicon] = useState<Set<string>>(new Set());
+  // Use refs to persist logo state across re-renders
+  const failedLogos = useRef<Set<string>>(new Set());
+  const triedIconHorse = useRef<Set<string>>(new Set());
+  const triedGoogleFavicon = useRef<Set<string>>(new Set());
 
   const getDisplayName = (t: Transaction) => {
     const source = (t.text && t.text !== 'N/A' ? t.text : t.description) || '';
@@ -124,12 +196,44 @@ const TransactionList: React.FC<TransactionListProps> = ({ transactions }) => {
 
   return (
     <div className={`card txn-contrast`}>
-      <div className="card-header d-flex align-items-center justify-content-between">
-        <h3 className="mb-0">💳 Recent Transactions</h3>
+      <div className="card-header">
+        <div className="d-flex align-items-center justify-content-between">
+          <h5 className="mb-0">Transactions</h5>
+        </div>
+        {getAvailableMonths.length > 0 && (
+          <div className="mt-2">
+            <div className="d-flex align-items-center justify-content-between">
+              <span className="fw-bold text-primary">
+                {currentMonth ? formatMonth(currentMonth) : 'Select Month'}
+              </span>
+              <div className="d-flex align-items-center gap-2">
+                <button
+                  className="btn btn-sm btn-outline-secondary"
+                  onClick={goToPreviousMonth}
+                  disabled={getCurrentMonthIndex() >= getAvailableMonths.length - 1}
+                >
+                  ←
+                </button>
+                <button
+                  className="btn btn-sm btn-outline-secondary"
+                  onClick={goToNextMonth}
+                  disabled={getCurrentMonthIndex() <= 0}
+                >
+                  →
+                </button>
+              </div>
+            </div>
+            <div className="mt-1">
+              <small className="text-muted">
+                Showing {getTransactionsForMonth(currentMonth).length} transactions for {currentMonth ? formatMonth(currentMonth) : 'selected month'}
+              </small>
+            </div>
+          </div>
+        )}
       </div>
       <div className="card-body">
         {Object.keys(groupedTransactions).length === 0 ? (
-          <p className="text-muted text-center">No transactions found</p>
+          <p className="text-muted text-center">No transactions found for {currentMonth ? formatMonth(currentMonth) : 'this month'}</p>
         ) : (
           Object.entries(groupedTransactions).map(([date, dayTransactions]) => {
             const coalesced = coalesceTransferPairs(dayTransactions);
@@ -146,7 +250,7 @@ const TransactionList: React.FC<TransactionListProps> = ({ transactions }) => {
                 return (
                 <div key={transaction.id || index} className="txn-row d-flex align-items-center justify-content-between">
                   <div className={`txn-avatar me-3 ${/^(Transfer)$/i.test(transaction.description) ? 'txn-avatar-transfer' : ''}`}>
-                    {resolvedUrl && !failedLogos.has(transaction.id) ? (
+                    {resolvedUrl && !failedLogos.current.has(transaction.id) ? (
                       <img
                         src={resolvedUrl.replace('logo.clearbit.com/', 'logo.clearbit.com/').replace(/(\?|$)/, (m) => m === '?' ? '?size=256&' : '?size=256')}
                         alt=""
@@ -157,12 +261,12 @@ const TransactionList: React.FC<TransactionListProps> = ({ transactions }) => {
                         onError={(e) => {
                           const img = e.currentTarget as HTMLImageElement;
                           // 1) Try IconHorse
-                          if (!triedIconHorse.has(transaction.id)) {
+                          if (!triedIconHorse.current.has(transaction.id)) {
                             try {
                               const domain = resolvedDomain || new URL(resolvedUrl!).hostname;
                               const iconHorse = `https://icon.horse/icon/${domain}`;
                               img.src = iconHorse;
-                              setTriedIconHorse(prev => new Set(prev).add(transaction.id));
+                              triedIconHorse.current.add(transaction.id);
                               if (debugLogos) {
                                 // eslint-disable-next-line no-console
                                 console.warn('Logo 404, switching to IconHorse:', { id: transaction.id, resolvedUrl, iconHorse });
@@ -171,12 +275,12 @@ const TransactionList: React.FC<TransactionListProps> = ({ transactions }) => {
                             } catch {}
                           }
                           // 2) Try Google favicon
-                          if (!triedGoogleFavicon.has(transaction.id)) {
+                          if (!triedGoogleFavicon.current.has(transaction.id)) {
                             try {
                               const domain = resolvedDomain || new URL(resolvedUrl!).hostname;
                               const googleFav = `https://www.google.com/s2/favicons?domain=${domain}&sz=64`;
                               img.src = googleFav;
-                              setTriedGoogleFavicon(prev => new Set(prev).add(transaction.id));
+                              triedGoogleFavicon.current.add(transaction.id);
                               if (debugLogos) {
                                 // eslint-disable-next-line no-console
                                 console.warn('IconHorse failed, switching to Google favicon:', { id: transaction.id, googleFav });
@@ -189,7 +293,7 @@ const TransactionList: React.FC<TransactionListProps> = ({ transactions }) => {
                             // eslint-disable-next-line no-console
                             console.error('All logo fallbacks failed, showing initials:', { id: transaction.id });
                           }
-                          setFailedLogos(prev => new Set(prev).add(transaction.id));
+                          failedLogos.current.add(transaction.id);
                         }}
                         onLoad={() => {
                           if (debugLogos) {
@@ -219,6 +323,9 @@ const TransactionList: React.FC<TransactionListProps> = ({ transactions }) => {
                       )}
                       {isPresent(transaction.time) && (
                         <span className="text-muted small">{transaction.time}</span>
+                      )}
+                      {transaction.accountName && (
+                        <span className="badge bg-secondary small">🏦 {transaction.accountName}</span>
                       )}
                       {isPresent(transaction.message) && (
                         <span className="text-muted small">• {transaction.message}</span>

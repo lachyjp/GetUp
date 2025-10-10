@@ -1,9 +1,11 @@
 import React, { useState } from 'react';
 import { AppState } from '../App';
 import AccountSummary from './AccountSummary';
-import TransactionList from './TransactionList';
+import AccountTabs from './AccountTabs';
+import TransactionList from './transactions/TransactionList';
 import SpendingStats from './SpendingStats';
 import Settings from './Settings';
+import { LoadingSpinner, ErrorAlert, Button } from './shared';
 
 interface DashboardProps {
   state: AppState;
@@ -14,6 +16,7 @@ interface DashboardProps {
 const Dashboard: React.FC<DashboardProps> = ({ state, onLogout, onRefresh }) => {
   const { userData, accounts, transactions, loading, error } = state;
   const [showSettings, setShowSettings] = useState(false);
+  const [selectedAccountId, setSelectedAccountId] = useState<string | null>(null);
 
   return (
     <div>
@@ -24,45 +27,34 @@ const Dashboard: React.FC<DashboardProps> = ({ state, onLogout, onRefresh }) => 
         </div>
         <div className="col-auto">
           <div className="btn-group">
-            <button 
-              className="btn btn-outline-secondary"
+            <Button 
+              variant="outline-secondary"
               onClick={onRefresh}
-              disabled={loading}
+              loading={loading}
             >
-              {loading ? '⏳ Refreshing...' : '🔄 Refresh Data'}
-            </button>
-            <button 
-              className="btn btn-outline-secondary"
+              🔄 Refresh Data
+            </Button>
+            <Button 
+              variant="outline-secondary"
               onClick={() => setShowSettings(true)}
             >
               Settings
-            </button>
-            <button 
-              className="btn btn-outline-danger"
+            </Button>
+            <Button 
+              variant="outline-danger"
               onClick={onLogout}
             >
               Logout
-            </button>
+            </Button>
           </div>
         </div>
       </div>
 
       {/* Error Message */}
-      {error && (
-        <div className="alert alert-danger" role="alert">
-          <strong>Error:</strong> {error}
-        </div>
-      )}
+      {error && <ErrorAlert message={error} />}
 
       {/* Loading State */}
-      {loading && (
-        <div className="text-center py-4">
-          <div className="spinner-border text-primary" role="status">
-            <span className="visually-hidden">Loading...</span>
-          </div>
-          <p className="mt-2">Loading your data...</p>
-        </div>
-      )}
+      {loading && <LoadingSpinner text="Loading your data..." />}
 
       {/* Main Content */}
       {!loading && (
@@ -70,22 +62,33 @@ const Dashboard: React.FC<DashboardProps> = ({ state, onLogout, onRefresh }) => 
           {showSettings ? (
             <Settings onClose={() => setShowSettings(false)} />
           ) : (
-            <SpendingStats transactions={transactions} />
+            <div className="row g-3" style={{position: 'relative', zIndex: 0}}>
+              <div className="col-md-4 col-lg-3 mb-4 position-relative" style={{zIndex: 1}}>
+                <div className="column-clip">
+                  <AccountSummary accounts={accounts} />
+                  <SpendingStats 
+                    transactions={transactions} 
+                    accounts={accounts}
+                    selectedAccountId={selectedAccountId}
+                  />
+                </div>
+              </div>
+              <div className="col-md-8 col-lg-9 position-relative" style={{zIndex: 1}}>
+                <div className="column-clip">
+                  <AccountTabs 
+                    accounts={accounts}
+                    transactions={transactions}
+                    selectedAccountId={selectedAccountId}
+                    onAccountSelect={setSelectedAccountId}
+                  />
+                  <TransactionList 
+                    transactions={transactions} 
+                    selectedAccountId={selectedAccountId}
+                  />
+                </div>
+              </div>
+            </div>
           )}
-
-          {/* Two-column layout: accounts (narrow) | transactions (wide) */}
-          <div className="row g-3" style={{position: 'relative', zIndex: 0}}>
-            <div className="col-md-4 col-lg-3 mb-4 position-relative" style={{zIndex: 1}}>
-              <div className="column-clip">
-                <AccountSummary accounts={accounts} />
-              </div>
-            </div>
-            <div className="col-md-8 col-lg-9 position-relative" style={{zIndex: 1}}>
-              <div className="column-clip">
-                {!showSettings && <TransactionList transactions={transactions} />}
-              </div>
-            </div>
-          </div>
         </>
       )}
     </div>

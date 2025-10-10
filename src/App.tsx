@@ -3,6 +3,7 @@ import 'bootstrap/dist/css/bootstrap.min.css';
 import './App.css';
 import LoginForm from './components/LoginForm';
 import Dashboard from './components/Dashboard';
+import ErrorBoundary from './components/ErrorBoundary';
 import { useUpBankData } from './hooks/useUpBankData';
 
 // Types for our app
@@ -33,6 +34,8 @@ export interface Transaction {
   roundup: string;
   tags?: string[];
   merchantLogoUrl?: string;
+  accountId?: string;
+  accountName?: string;
 }
 
 export interface AppState {
@@ -45,6 +48,14 @@ export interface AppState {
 }
 
 function App() {
+  // Set dynamic tab title based on environment
+  useEffect(() => {
+    const isLocalhost = window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1';
+    const baseTitle = 'GetUp ↑';
+    const environment = isLocalhost ? ' [DEV]' : ' [PROD]';
+    document.title = baseTitle + environment;
+  }, []);
+
   // Use our custom hook for Up Bank data
   const {
     accounts,
@@ -56,25 +67,14 @@ function App() {
     clearData
   } = useUpBankData();
 
-  // Main app state
-  const [state, setState] = useState<AppState>({
-    isLoggedIn: false,
-    userData: null,
-    accounts: [],
-    transactions: [],
-    loading: false,
-    error: null
-  });
+  // Main app state - only track login state and user data
+  const [isLoggedIn, setIsLoggedIn] = useState(false);
+  const [userData, setUserData] = useState<UserData | null>(null);
 
   // Function to handle login
   const handleLogin = async (userData: UserData) => {
-    setState(prev => ({
-      ...prev,
-      isLoggedIn: true,
-      userData,
-      loading: true,
-      error: null
-    }));
+    setIsLoggedIn(true);
+    setUserData(userData);
     
     // Fetch data from Up Bank API
     await fetchData(userData);
@@ -82,21 +82,15 @@ function App() {
 
   // Function to handle logout
   const handleLogout = () => {
-    setState({
-      isLoggedIn: false,
-      userData: null,
-      accounts: [],
-      transactions: [],
-      loading: false,
-      error: null
-    });
+    setIsLoggedIn(false);
+    setUserData(null);
     clearData();
   };
 
   // Function to handle refresh
   const handleRefresh = async () => {
-    if (state.userData) {
-      await refreshData(state.userData);
+    if (userData) {
+      await refreshData(userData);
     }
   };
 
@@ -105,21 +99,26 @@ function App() {
       <div className="container">
         <h1 className="text-center mb-4">GetUp ↑</h1>
         
-        {!state.isLoggedIn ? (
-          <LoginForm onLogin={handleLogin} />
-        ) : (
-          <Dashboard 
-            state={{
-              ...state,
-              accounts,
-              transactions,
-              loading,
-              error
-            }}
-            onLogout={handleLogout}
-            onRefresh={handleRefresh}
-          />
-        )}
+        <ErrorBoundary>
+          {!isLoggedIn ? (
+            <LoginForm onLogin={handleLogin} />
+          ) : (
+            <ErrorBoundary>
+              <Dashboard 
+                state={{
+                  isLoggedIn,
+                  userData,
+                  accounts,
+                  transactions,
+                  loading,
+                  error
+                }}
+                onLogout={handleLogout}
+                onRefresh={handleRefresh}
+              />
+            </ErrorBoundary>
+          )}
+        </ErrorBoundary>
       </div>
     </div>
   );

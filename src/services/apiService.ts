@@ -8,7 +8,7 @@ const API_CONFIG = {
   timeout: 30000,
   retryAttempts: 3,
   retryDelay: 1000,
-  cacheTime: 5 * 60 * 1000, // 5 minutes
+  cacheTime: 2 * 60 * 1000, // 2 minutes
 };
 
 // Cache for API responses
@@ -138,13 +138,25 @@ class UpBankApiService {
       }
 
       // Process accounts data
-      const accounts: Account[] = response.data.data.map((item: any) => ({
-        id: item.id,
-        name: item.attributes.displayName,
-        balance: parseFloat(item.attributes.balance.value),
-        type: item.attributes.accountType,
-        owner: item.attributes.ownershipType,
-      }));
+      const accounts: Account[] = response.data.data.map((item: any) => {
+        const displayName = item.attributes.displayName;
+        const accountType = item.attributes.accountType;
+        
+        // Check if account name contains 🤔 emoji and label as maybuy saver
+        const isMaybuySaver = displayName.includes('🤔');
+        const finalType = isMaybuySaver ? 'MAYBUY_SAVER' : accountType;
+        
+        // Trim 🤔 emoji from name if it's a maybuy saver
+        const finalName = isMaybuySaver ? displayName.replace('🤔', '').trim() : displayName;
+        
+        return {
+          id: item.id,
+          name: finalName,
+          balance: parseFloat(item.attributes.balance.value),
+          type: finalType,
+          owner: item.attributes.ownershipType,
+        };
+      });
 
       // Cache the results
       this.setCachedData(cacheKey, accounts);
@@ -156,7 +168,7 @@ class UpBankApiService {
     }
   }
 
-  // Fetch transactions from Up Bank API
+  // Fetch transactions from Up Bank API with pagination support
   async fetchTransactions(transactionCount: number): Promise<{ success: boolean; data?: Transaction[]; error?: string }> {
     try {
       // Check cache first
@@ -167,33 +179,71 @@ class UpBankApiService {
         return { success: true, data: cachedData };
       }
 
-      const response = await this.retryRequest(
-        () => axios.get(`${API_CONFIG.baseURL}/transactions?page[size]=${transactionCount}&include=merchant`, {
-          headers: { Authorization: `Bearer ${this.apiKey}` },
-          timeout: API_CONFIG.timeout,
-        }),
-        'Transactions fetch'
-      );
+      // Up Bank API has a max page size of 100, so we need to paginate for more
+      const maxPageSize = 100;
+      const totalRequested = Math.min(transactionCount, 200);
+      const pagesNeeded = Math.ceil(totalRequested / maxPageSize);
+      
+      console.log(`Fetching ${totalRequested} transactions across ${pagesNeeded} page(s) (Up API max: ${maxPageSize} per page)`);
+      
+      let allTransactions: any[] = [];
+      let allIncluded: any[] = [];
+      let nextPageUrl: string | null = null;
 
-      if (!this.validateApiResponse(response.data, 'transactions')) {
-        return { success: false, error: 'Invalid response format from Up API' };
+      // Fetch all pages
+      for (let page = 0; page < pagesNeeded; page++) {
+        const url: string = nextPageUrl || `${API_CONFIG.baseURL}/transactions?page[size]=${maxPageSize}&include=merchant,account`;
+        
+        const response: AxiosResponse<any> = await this.retryRequest(
+          (): Promise<AxiosResponse<any>> => axios.get(url, {
+            headers: { Authorization: `Bearer ${this.apiKey}` },
+            timeout: API_CONFIG.timeout,
+          }),
+          `Transactions fetch page ${page + 1}`
+        );
+
+        if (!this.validateApiResponse(response.data, 'transactions')) {
+          return { success: false, error: 'Invalid response format from Up API' };
+        }
+
+        // Collect transactions and included data
+        allTransactions = allTransactions.concat(response.data.data);
+        allIncluded = allIncluded.concat(response.data.included || []);
+
+        // Check if we have enough transactions or if there are no more pages
+        if (allTransactions.length >= totalRequested || !response.data.links?.next) {
+          break;
+        }
+
+        // Get next page URL
+        nextPageUrl = response.data.links.next;
       }
 
-      // Build merchant lookup from included
-      const included = response.data.included || [];
+      // Limit to requested amount
+      allTransactions = allTransactions.slice(0, totalRequested);
+      
+      console.log(`Successfully fetched ${allTransactions.length} transactions`);
+
+      // Build merchant and account lookup from all included data
       const merchantById: Record<string, { name?: string; websiteUrl?: string }> = {};
-      for (const inc of included) {
+      const accountById: Record<string, { name?: string; type?: string }> = {};
+      
+      for (const inc of allIncluded) {
         if (inc.type === 'merchants') {
           merchantById[inc.id] = {
             name: inc.attributes?.name,
             websiteUrl: inc.attributes?.websiteUrl,
           };
+        } else if (inc.type === 'accounts') {
+          accountById[inc.id] = {
+            name: inc.attributes?.displayName || inc.attributes?.name,
+            type: inc.attributes?.accountType,
+          };
         }
       }
 
       // Process transactions data
-      const transactions: Transaction[] = response.data.data
-        .slice(4) // Skip first 4 items (as in original)
+      const transactions: Transaction[] = allTransactions
         .map((item: any) => {
           const amount = parseFloat(item.attributes.amount.value);
           const isPositive = amount >= 0;
@@ -205,7 +255,9 @@ class UpBankApiService {
           const description: string = item.attributes.description;
           const rawText: string = item.attributes.rawText || 'N/A';
           const merchantId: string | undefined = item.relationships?.merchant?.data?.id;
+          const accountId: string | undefined = item.relationships?.account?.data?.id;
           const merchantInfo = merchantId ? merchantById[merchantId] : undefined;
+          const accountInfo = accountId ? accountById[accountId] : undefined;
 
           let merchantLogoUrl: string | undefined;
           if (merchantInfo?.websiteUrl) {
@@ -231,6 +283,8 @@ class UpBankApiService {
               ? item.relationships.tags.data.map((t: any) => t.id?.replace('tag-', '')).filter(Boolean)
               : [],
             merchantLogoUrl,
+            accountId: accountId,
+            accountName: accountInfo?.name,
           };
         });
 

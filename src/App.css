@@ -213,6 +213,28 @@ label {
     color: #f8d7da;
 }
 
+.alert-warning {
+    background-color: #fff2cb;
+    border-color: #856404;
+    color: #212529;
+}
+
+.alert-warning .alert-heading {
+    color: #212529 !important;
+}
+
+.alert-warning p {
+    color: #212529 !important;
+}
+
+.alert-warning ul {
+    color: #212529 !important;
+}
+
+.alert-warning li {
+    color: #212529 !important;
+}
+
 /* Spinner Styles */
 .spinner-border {
     color: #e57d68;
@@ -227,9 +249,6 @@ label {
     margin-bottom: 0.5rem;
 }
 
-.account-card {
-    background-color: #343444;
-    border: 1px solid #2d2d3b;
 .column-clip {
     position: relative;
     overflow: visible; /* ensure gutter doesn't visually overlap cards */
@@ -241,33 +260,195 @@ label {
     box-shadow: 0 6px 18px rgba(0,0,0,0.2);
     position: relative;
     z-index: 1; /* float above any gutter artifacts */
-    overflow: hidden; /* hard-clip interior shadows to the rounded container */
+    overflow: visible; /* allow dropdowns to extend beyond card */
 }
-}
-/* Accounts card container tweaks */
-.accounts-card {
-    border-radius: 14px;
-}
+
 .accounts-card .card-body {
-    padding: 1rem 1rem; /* tighter sides */
+    padding: 1.5rem 1.25rem; /* increased padding for better spacing */
+}
+
+/* Total Balance Section */
+.total-balance-section {
+    background: linear-gradient(135deg, #2d2d3b 0%, #343444 100%);
+    border-radius: 12px;
+    padding: 1.25rem;
+    border: 1px solid #3a3a4a;
+    margin-bottom: 1.5rem;
 }
 
 .total-balance-amount {
-    font-size: 1.5rem;
+    font-size: 2rem;
     font-weight: 700;
     color: #e57d68;
+    margin-bottom: 0.25rem;
+}
+
+.balance-trend {
+    font-size: 0.875rem;
+}
+
+/* Account Groups */
+.account-group {
+    margin-bottom: 1.5rem;
+    position: relative;
+    z-index: 1;
+}
+
+.account-group:last-child {
+    margin-bottom: 0;
+}
+
+.account-group-header {
+    border-bottom: 1px solid #3a3a4a;
+    padding-bottom: 0.75rem;
+}
+
+.group-balance {
+    font-size: 0.9rem;
+}
+
+/* Account Cards */
+.account-card {
+    background-color: #2d2d3b;
+    border: 1px solid #3a3a4a;
+    border-radius: 10px;
+    transition: all 0.2s ease;
+    position: relative;
+    overflow: visible;
+    margin-bottom: 0.5rem;
+    z-index: 1;
+}
+
+.account-card:hover {
+    transform: translateY(-1px);
+    box-shadow: 0 4px 12px rgba(0,0,0,0.15);
+    border-color: #4a4a5a;
 }
 
 .account-card .card-body {
-    padding: 0.75rem 1rem; /* compact */
+    padding: 1rem 1.25rem; /* increased padding */
 }
 
 .account-card .card-title {
-    margin-bottom: 0.25rem; /* compact */
+    margin-bottom: 0;
+    font-size: 0.95rem;
+    font-weight: 600;
+    color: #fbfbfa;
 }
 
-.account-card .card-text {
-    margin-bottom: 0.25rem; /* compact */
+.account-icon {
+    font-size: 1.1rem;
+    display: inline-block;
+    width: 24px;
+    text-align: center;
+}
+
+.account-balance {
+    display: flex;
+    flex-direction: column;
+    align-items: flex-end;
+}
+
+.account-balance .fw-bold {
+    font-size: 1.1rem;
+    color: #e57d68;
+}
+
+/* Badge improvements */
+.badge {
+    font-size: 0.7rem;
+    font-weight: 600;
+    padding: 0.35em 0.65em;
+}
+
+.bg-outline-success {
+    background-color: rgba(40, 167, 69, 0.1) !important;
+    color: #28a745 !important;
+    border: 1px solid rgba(40, 167, 69, 0.3);
+}
+
+.bg-outline-warning {
+    background-color: rgba(255, 193, 7, 0.1) !important;
+    color: #ffc107 !important;
+    border: 1px solid rgba(255, 193, 7, 0.3);
+}
+
+.bg-outline-danger {
+    background-color: rgba(220, 53, 69, 0.1) !important;
+    color: #dc3545 !important;
+    border: 1px solid rgba(220, 53, 69, 0.3);
+}
+
+/* Account Menu Dropdown */
+.account-menu-dropdown {
+    position: relative;
+}
+
+.dropdown-menu {
+    background-color: #2d2d3b;
+    border: 1px solid #3a3a4a;
+    border-radius: 8px;
+    box-shadow: 0 4px 12px rgba(0,0,0,0.3);
+    min-width: 200px;
+    z-index: 9999;
+    position: absolute;
+    top: 100%;
+    right: 0;
+    left: auto;
+    margin-top: 0.25rem;
+}
+
+.dropdown-header {
+    color: #e57d68;
+    font-size: 0.8rem;
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+    margin-bottom: 0.5rem;
+    padding-bottom: 0.25rem;
+    border-bottom: 1px solid #3a3a4a;
+}
+
+.dropdown-item-text {
+    padding: 0.5rem 1rem;
+    color: #8a8a9a;
+    font-size: 0.75rem;
+    border-top: 1px solid #3a3a4a;
+    margin-top: 0.5rem;
+}
+
+.dropdown-toggle::after {
+    display: none;
+}
+
+.dropdown-toggle {
+    border: 1px solid #3a3a4a;
+    background-color: transparent;
+    color: #8a8a9a;
+    padding: 0.25rem 0.5rem;
+    font-size: 0.8rem;
+    border-radius: 4px;
+    transition: all 0.2s ease;
+}
+
+.dropdown-toggle:hover {
+    background-color: #3a3a4a;
+    color: #fbfbfa;
+    border-color: #4a4a5a;
+}
+
+.dropdown-toggle:focus {
+    box-shadow: 0 0 0 0.2rem rgba(229, 125, 104, 0.25);
+    border-color: #e57d68;
+}
+
+/* Ensure dropdown container has high z-index when active */
+.dropdown.show {
+    z-index: 10000;
+}
+
+.dropdown.show .dropdown-menu {
+    z-index: 10001;
 }
 
 .txn-row:hover {
@@ -397,6 +578,54 @@ label {
 
 .text-warning {
     color: #ffc107 !important;
+}
+
+/* Custom tab bar styling */
+.nav-tabs .nav-link {
+  /* Custom button styles */
+  border: none;
+  background: #2d2d3a;
+  color: #b8b8c7;
+  border-radius: 8px 8px 0 0;
+  margin-right: 4px;
+  font-weight: 500;
+  padding: 12px 16px;
+  transition: all 0.2s ease;
+  border-bottom: 3px solid transparent; /* Reserve space for active border */
+  box-sizing: border-box;
+}
+
+.nav-tabs .nav-link.active {
+  /* Active tab styles */
+  background: #e57d68;
+  color: #ffffff;
+  border-bottom: 3px solid #d1543b;
+  font-weight: 600;
+  box-shadow: 0 2px 4px rgba(229, 125, 104, 0.3);
+}
+
+.nav-tabs .nav-link:hover {
+  /* Hover styles */
+  background: #3a3a4a;
+  color: #ffffff;
+  transform: translateY(-1px);
+}
+
+.nav-tabs .nav-link .fw-bold {
+  font-weight: 600;
+  font-size: 0.95rem;
+}
+
+.nav-tabs .nav-link small {
+  font-size: 0.75rem;
+  font-weight: 500;
+  opacity: 0.9;
+}
+
+.nav-tabs .nav-link.active small {
+  opacity: 1;
+  font-weight: 600;
+  color: #ffffff !important;
 }
 
 /* Mobile Responsiveness */

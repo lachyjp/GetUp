@@ -1,6 +1,7 @@
 import React, { useEffect, useState } from 'react';
 import { UserData } from '../App';
 import { encryptAndStore, hasStored, tryDecrypt, clearStored } from '../services/secureStorage';
+import { CONFIG } from '../config/constants';
 
 interface LoginFormProps {
   onLogin: (userData: UserData) => void;
@@ -17,8 +18,8 @@ const LoginForm: React.FC<LoginFormProps> = ({ onLogin }) => {
   const [rememberMe, setRememberMe] = useState<boolean>(false);
   const [pin, setPin] = useState<string>('');
   const [hasSavedKey, setHasSavedKey] = useState<boolean>(false);
-  const STORAGE_KEY = 'up-api-key';
-  const DEMO_KEY = '__DEMO__';
+  const STORAGE_KEY = CONFIG.STORAGE.API_KEY;
+  const DEMO_KEY = CONFIG.DEFAULTS.DEMO_API_KEY;
 
   useEffect(() => {
     setHasSavedKey(hasStored(STORAGE_KEY));
@@ -27,7 +28,7 @@ const LoginForm: React.FC<LoginFormProps> = ({ onLogin }) => {
   // Function to validate API key format
   const validateApiKey = (apiKey: string): boolean => {
     const trimmedKey = apiKey.trim();
-    return trimmedKey.length >= 15 && /^up:yeah:[A-Za-z0-9_-]+$/.test(trimmedKey);
+    return trimmedKey.length >= CONFIG.VALIDATION.MIN_API_KEY_LENGTH && /^up:yeah:[A-Za-z0-9_-]+$/.test(trimmedKey);
   };
 
   // Function to validate the form
@@ -57,8 +58,8 @@ const LoginForm: React.FC<LoginFormProps> = ({ onLogin }) => {
     const apiKey = formData.apiKey.trim();
 
     if (rememberMe) {
-      if (!pin || pin.length < 4) {
-        setErrors(prev => ({ ...prev, pin: 'Enter a 4+ digit PIN to encrypt your key' }));
+      if (!pin || pin.length < CONFIG.VALIDATION.MIN_PIN_LENGTH) {
+        setErrors(prev => ({ ...prev, pin: `Enter a ${CONFIG.VALIDATION.MIN_PIN_LENGTH}+ digit PIN to encrypt your key` }));
         return;
       }
       await encryptAndStore(STORAGE_KEY, apiKey, pin);
@@ -68,14 +69,14 @@ const LoginForm: React.FC<LoginFormProps> = ({ onLogin }) => {
     onLogin({
       apiKey,
       userName: formData.userName.trim(),
-      transactionCount: 50
+      transactionCount: CONFIG.DEFAULTS.TRANSACTION_COUNT
     });
   };
 
   const handleUnlock = async (e: React.FormEvent) => {
     e.preventDefault();
-    if (!pin || pin.length < 4) {
-      setErrors(prev => ({ ...prev, pin: 'Enter your PIN (4+ digits)' }));
+    if (!pin || pin.length < CONFIG.VALIDATION.MIN_PIN_LENGTH) {
+      setErrors(prev => ({ ...prev, pin: `Enter your PIN (${CONFIG.VALIDATION.MIN_PIN_LENGTH}+ digits)` }));
       return;
     }
     const decrypted = await tryDecrypt(STORAGE_KEY, pin);
@@ -86,7 +87,7 @@ const LoginForm: React.FC<LoginFormProps> = ({ onLogin }) => {
     onLogin({
       apiKey: decrypted,
       userName: formData.userName.trim(),
-      transactionCount: 50
+      transactionCount: CONFIG.DEFAULTS.TRANSACTION_COUNT
     });
   };
 
@@ -103,7 +104,7 @@ const LoginForm: React.FC<LoginFormProps> = ({ onLogin }) => {
     onLogin({
       apiKey: DEMO_KEY,
       userName: formData.userName.trim(),
-      transactionCount: 50,
+      transactionCount: CONFIG.DEFAULTS.TRANSACTION_COUNT,
     });
   };
 
@@ -196,6 +197,30 @@ const LoginForm: React.FC<LoginFormProps> = ({ onLogin }) => {
                       Remember this API key on this device (encrypted with a PIN)
                     </label>
                   </div>
+                  
+                  {rememberMe && (
+                    <div className="alert alert-warning mt-3" role="alert">
+                      <h6 className="alert-heading">🔒 Security Notice</h6>
+                      
+                      <p className="mb-2"><strong>Your API key is encrypted using AES-GCM with PBKDF2 key derivation (100,000 iterations)</strong></p>
+                      <ul className="mb-3">
+                        <li>Encrypted locally - only your browser can access it</li>
+                        <li>Read-only access - API cannot transfer funds or make changes</li>
+                        <li>Your PIN for your browser protects the encryption key</li>
+                      </ul>
+                      
+                      <p className="mb-2"><strong>Security tips:</strong></p>
+                      <ul className="mb-3">
+                        <li>Use a strong PIN (6+ digits)</li>
+                        <li>Don't use on shared devices</li>
+                        <li>Generate a 48hr only key on the Up app</li>
+                      </ul>
+                      
+                      <p className="mb-0 text-muted small">
+                        <strong>Note:</strong> You can revoke access anytime in the Up Bank app.
+                      </p>
+                    </div>
+                  )}
                 </div>
               )}
 
